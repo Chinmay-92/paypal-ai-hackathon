@@ -1,5 +1,7 @@
 # Brainstorm: PayPal AI Hackathon (13 Oct 2026)
 
+> **Superseded decision (13 Oct 2026, later):** after stress testing, consumer Settle's core mechanic proved crowded (Gorgias AI Agent + Vision; a Sept 2026 *Marketing Science* field study of returnless partial refunds). The primary entry is now **SpecLock**, the B2B spec-locked trade agent. See [`stress-test.md`](stress-test.md). This file is kept as the record of how we got there.
+
 **Goal:** win the hackathon (judged on implementation, design, impact, innovation, presentation; ~13,400 entrants; PayPal judges).
 **Deadline:** 12 Nov 2026, 12:00 PST (13 Nov 01:30 IST).
 
