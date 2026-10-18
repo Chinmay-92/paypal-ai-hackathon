@@ -70,6 +70,7 @@ export async function createDeal(args: {
     messages: args.messages,
     spec: null,
     specProblems: [],
+    proposedSpecHash: null,
     specHash: null,
     approvals: { buyer: false, supplier: false },
     depositBps: args.depositBps ?? 3000,
@@ -97,6 +98,7 @@ export function proposeSpec(id: string, deps: Deps) {
     const { spec, problems } = await deps.extractSpec(deal.messages);
     deal.spec = spec;
     deal.specProblems = problems;
+    deal.proposedSpecHash = specHash(spec);
     deal.approvals = { buyer: false, supplier: false };
     deal.status = "spec_proposed";
     log(deal, "buyer_agent", `Proposed spec with ${spec.fields.length} fields${problems.length ? `; ${problems.length} citation problems` : ""}`, deps.now());

@@ -21,12 +21,14 @@ export class PayPalError extends Error {
   }
 }
 
+export class ConfigError extends Error {}
+
 export const SANDBOX_BASE_URL = "https://api-m.sandbox.paypal.com";
 
 export function configFromEnv(env: NodeJS.ProcessEnv = process.env): PayPalConfig {
   const clientId = env.PAYPAL_CLIENT_ID;
   const clientSecret = env.PAYPAL_CLIENT_SECRET;
-  if (!clientId || !clientSecret) throw new Error("PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET must be set");
+  if (!clientId || !clientSecret) throw new ConfigError("PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET must be set");
   return { clientId, clientSecret, baseUrl: env.PAYPAL_BASE_URL ?? SANDBOX_BASE_URL };
 }
 

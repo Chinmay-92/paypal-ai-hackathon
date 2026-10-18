@@ -12,6 +12,8 @@ export function claude(): Anthropic {
 
 export class ModelRefusalError extends Error {}
 export class ModelOutputError extends Error {}
+/** The SDK failed before reaching the API, e.g. no credentials configured. */
+export class ClaudeSetupError extends Error {}
 
 /**
  * One structured-output call. Server-side fallbacks ("default") re-run a request
@@ -24,15 +26,21 @@ export async function parseStructured<S extends z.ZodType>(args: {
   effort?: "low" | "medium" | "high" | "xhigh" | "max";
   maxTokens?: number;
 }): Promise<z.infer<S>> {
-  const response = await claude().beta.messages.parse({
-    model: MODEL,
-    max_tokens: args.maxTokens ?? 16000,
-    betas: ["server-side-fallback-2026-07-01"],
-    fallbacks: "default",
-    output_config: { effort: args.effort ?? "medium", format: betaZodOutputFormat(args.schema) },
-    system: args.system,
-    messages: [{ role: "user", content: args.content }],
-  });
+  let response;
+  try {
+    response = await claude().beta.messages.parse({
+      model: MODEL,
+      max_tokens: args.maxTokens ?? 16000,
+      betas: ["server-side-fallback-2026-07-01"],
+      fallbacks: "default",
+      output_config: { effort: args.effort ?? "medium", format: betaZodOutputFormat(args.schema) },
+      system: args.system,
+      messages: [{ role: "user", content: args.content }],
+    });
+  } catch (err) {
+    if (err instanceof Anthropic.APIError) throw err;
+    throw new ClaudeSetupError(`Claude request failed before reaching the API: ${err instanceof Error ? err.message : String(err)}`);
+  }
   if (response.stop_reason === "refusal") {
     throw new ModelRefusalError(`Model declined: ${response.stop_details?.category ?? "unknown"}`);
   }

@@ -26,6 +26,9 @@ export type Deal = {
   messages: ChatMessage[];
   spec: ExtractedSpec | null;
   specProblems: string[];
+  /** Hash of the currently proposed spec; parties approve exactly this version. */
+  proposedSpecHash: string | null;
+  /** Hash of the spec both parties locked. */
   specHash: string | null;
   approvals: { buyer: boolean; supplier: boolean };
   depositBps: number;
