@@ -81,6 +81,8 @@ An idea is **killed** if any of these is true:
 | P12 | Checkout accessibility | Kill | Provider-controlled, AI layer obscures (K4) |
 | P13 | Agent approval provenance | **Absorbed** | Mandate component inside the B2B idea |
 
+> **Update 18 Oct 2026:** superseded by the deeper [`stress-test-speclock.md`](stress-test-speclock.md) (hybrid vision QC, verified money flow, head-to-head with [`stress-test-claimit.md`](stress-test-claimit.md)).
+
 ## 6. Survivor deep stress test: B2B spec-locked trade agent (working name **SpecLock**)
 
 ### The flow (realistic B2B terms: 30% deposit, 70% after pre-shipment inspection)

@@ -2,7 +2,9 @@
 
 Buyer and supplier agents lock a structured spec, pay the deposit through PayPal, verify pre-shipment photos against the spec with vision QC, and release the balance or negotiate a remedy within limits each side has set. The spec and QC record serve as evidence if a PayPal dispute follows.
 
-- [Stress test of every idea and the decision](docs/stress-test.md)
+- [SpecLock deep stress test + head-to-head vs ClaimIt (decision)](docs/stress-test-speclock.md)
+- [ClaimIt stress test (pre-agreed fallback)](docs/stress-test-claimit.md)
+- [Stress test of every earlier idea](docs/stress-test.md)
 - [Brainstorm history](docs/brainstorm.md)
 - [Background research](docs/research.md)
 
