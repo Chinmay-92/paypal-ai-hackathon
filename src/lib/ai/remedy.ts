@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { checkOffer, type BuyerMandate, type OfferCheck, type RemedyOffer, type SupplierMandate } from "../mandate";
 import type { Money } from "../money";
-import { parseStructured } from "./claude";
+import { parseStructured } from "./model";
 
 const OfferSchema = z.object({
   kind: z.enum(["discount", "remake"]),
@@ -31,7 +31,7 @@ export async function proposeRemedy(args: {
     .filter(Boolean)
     .join("\n\n");
 
-  const raw = await parseStructured({ schema: OfferSchema, system: SYSTEM, content: [{ type: "text", text }], effort: "medium" });
+  const raw = await parseStructured({ schema: OfferSchema, system: SYSTEM, content: [{ text }] });
   const offer: RemedyOffer =
     raw.kind === "discount"
       ? { kind: "discount", discountBps: raw.discountBps ?? 0, note: raw.note }

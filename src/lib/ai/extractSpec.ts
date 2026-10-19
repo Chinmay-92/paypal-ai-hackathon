@@ -1,5 +1,5 @@
 import { ExtractedSpec, validateCitations, type ChatMessage } from "../spec/schema";
-import { parseStructured } from "./claude";
+import { parseStructured } from "./model";
 
 const SYSTEM = `You turn a buyer–supplier negotiation into a structured product spec that both parties will sign.
 
@@ -18,8 +18,7 @@ export async function extractSpec(messages: ChatMessage[]) {
   const spec = await parseStructured({
     schema: ExtractedSpec,
     system: SYSTEM,
-    effort: "high",
-    content: [{ type: "text", text: `<negotiation>\n${transcript}\n</negotiation>` }],
+    content: [{ text: `<negotiation>\n${transcript}\n</negotiation>` }],
   });
   return { spec, problems: validateCitations(spec, messages) };
 }

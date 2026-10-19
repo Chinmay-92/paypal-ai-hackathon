@@ -1,9 +1,8 @@
-import type Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import type { FieldVerdict } from "../mandate";
 import type { PhotoChallenge } from "../qc/challenge";
 import type { SpecField } from "../spec/schema";
-import { parseStructured } from "./claude";
+import { parseStructured, type Part } from "./model";
 
 export type ShotPhoto = { shotId: string; mediaType: "image/jpeg" | "image/png" | "image/webp"; base64: string };
 
@@ -35,19 +34,18 @@ For each shot, transcribe the paper code and any unit or carton number exactly a
 
 export async function inspectPhotos(fields: SpecField[], challenge: PhotoChallenge, photos: ShotPhoto[]) {
   const visionFields = fields.filter((f) => f.method === "vision");
-  const content: Anthropic.Beta.BetaContentBlockParam[] = [];
+  const content: Part[] = [];
   for (const photo of photos) {
     const shot = challenge.shots.find((s) => s.id === photo.shotId);
-    content.push({ type: "text", text: `Shot ${photo.shotId}: ${shot?.instruction ?? "unrequested shot"}` });
-    content.push({ type: "image", source: { type: "base64", media_type: photo.mediaType, data: photo.base64 } });
+    content.push({ text: `Shot ${photo.shotId}: ${shot?.instruction ?? "unrequested shot"}` });
+    content.push({ inlineData: { mimeType: photo.mediaType, data: photo.base64 } });
   }
   content.push({
-    type: "text",
     text:
       "Fields to check:\n" +
       visionFields.map((f) => `- ${f.id}: ${f.attribute} — ${f.requirement}`).join("\n"),
   });
-  const result = await parseStructured({ schema: VisionResult, system: SYSTEM, content, effort: "high" });
+  const result = await parseStructured({ schema: VisionResult, system: SYSTEM, content });
   return {
     result,
     validShotIds: [...validShots(challenge, result)],

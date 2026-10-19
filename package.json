@@ -12,7 +12,7 @@
     "spike:paypal": "node --env-file-if-exists=.env.local --import tsx scripts/paypal-spike.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.135.0",
+    "@google/genai": "^2.30.0",
     "next": "16.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",

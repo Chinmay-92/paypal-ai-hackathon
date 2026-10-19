@@ -4,11 +4,11 @@ Buyer and supplier agents lock a structured spec, pay the deposit through PayPal
 
 ## How it works
 
-1. **Spec lock.** Claude extracts a structured spec from the negotiation. Every field cites the message it came from, and citations are checked verbatim in code. Both parties approve the exact version (by hash).
+1. **Spec lock.** Gemini extracts a structured spec from the negotiation. Every field cites the message it came from, and citations are checked verbatim in code. Both parties approve the exact version (by hash).
 2. **Authorize, capture the deposit.** The buyer authorizes the full order once through PayPal (`intent: AUTHORIZE`). Only the 30% deposit is captured (`final_capture: false`).
 3. **Photo challenge.** The buyer agent asks for randomly chosen units and cartons, with a one-time code on paper in every frame.
 4. **Hybrid QC.**
-   - Claude judges only what photos show reliably: logo/print presence and placement, label text, packaging, gross defects.
+   - Gemini judges only what photos show reliably: logo/print presence and placement, label text, packaging, gross defects.
    - Exact colour is computed in code: CIEDE2000 against the agreed target, white-balanced on a reference card's neutral patch.
    - Material, weight and fine tolerances always go to a human.
    - A verdict only counts if its photo carried the correct code.
@@ -22,7 +22,7 @@ Every PayPal call that moves money carries its own `PayPal-Request-Id`, so retri
 ## Run locally
 
 ```bash
-cp .env.example .env.local   # add PayPal sandbox + Claude credentials
+cp .env.example .env.local   # add PayPal sandbox credentials + GEMINI_API_KEY
 npm install
 npm test                     # unit + workflow tests (no network)
 npm run spike:paypal         # day-1 sandbox spike: authorize → partial captures → idempotent refund
@@ -39,7 +39,7 @@ Sandbox setup:
 | Area | State |
 |---|---|
 | Money math, CIEDE2000 colour check, mandates, photo challenge, PayPal client, deal workflow | Built, unit-tested with a fake PayPal API |
-| Claude spec extraction, vision QC, remedy offers | Built; **not yet run against the live API** |
+| Gemini spec extraction, vision QC, remedy offers | Spec extraction verified live on gemini-flash-latest (all citations valid); vision QC and remedy not yet run live |
 | PayPal sandbox | **Not yet run against the live sandbox** (`npm run spike:paypal`) |
 | Storage | Local JSON files; needs a database before hosting |
 | Auth | None: one browser plays both parties (demo only) |
