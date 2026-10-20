@@ -28,7 +28,8 @@ Research accessed October 19–20, 2026. Evidence is not an endorsement of vendo
 - D07: Initial explicit upload/paste/portal intake. WhatsApp/email connectors later and only through authorized routes.
 - D08: Preserve historical docs and SpecLock code branch; current Pact blueprint supersedes their product direction.
 - D09: Immutable published revisions, independent funding/fulfillment states and durable operation recovery.
-- D10: This branch contains documentation, fixtures and documentation checks only.
+- D10: At blueprint creation this branch contained documentation, fixtures and documentation checks only; the later MCP prototype is recorded in D11.
+- D11: Add a local stdio MCP adapter as an AI-host interface. The host may interpret correspondence and propose structured changes; the adapter verifies quote presence and revision freshness, and stores only a merchant-review draft. It does not replace the planned authenticated Pact application API, and has no payment or outbound-message tools.
 
 ## Open decisions and gates
 

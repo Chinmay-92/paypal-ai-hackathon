@@ -1,0 +1,28 @@
+{
+  "jobs": [
+    {
+      "id": "job-apparel-001",
+      "customer": "Demo customer",
+      "domain": "custom-apparel",
+      "currency": "USD",
+      "revision": 3,
+      "scope": {
+        "garment": "Classic tee",
+        "quantity": "24",
+        "artwork": "Front chest logo, artwork A",
+        "deliveryDate": "2026-11-18",
+        "totalMinor": "48000"
+      },
+      "editableFields": ["garment", "quantity", "artwork", "deliveryDate"],
+      "messages": [
+        {
+          "id": "msg-1",
+          "author": "Demo customer (fixture; authorship not verified)",
+          "receivedAt": "2026-10-19T14:20:00Z",
+          "body": "Could we switch 8 of the 24 classic tees to hoodies? Please keep the front chest logo. We need the order by November 18. What would that cost?"
+        }
+      ],
+      "drafts": []
+    }
+  ]
+}

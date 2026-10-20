@@ -4,7 +4,7 @@
 
 Pact is a responsive web application for businesses selling custom goods and project services. It turns customer amendment requests into reviewed revisions, explicit approvals, correct PayPal payments, and current fulfillment instructions.
 
-**Status: product and implementation blueprint. This branch does not contain a runnable Pact application.** All proposed behavior and acceptance criteria below are requirements, not claims of completed functionality or proven demand.
+**Status: product blueprint plus a runnable local MCP prototype. There is no complete Pact web app yet.** Proposed behavior and acceptance criteria below are requirements, not claims of production functionality or proven demand.
 
 ## The problem
 
@@ -41,6 +41,18 @@ Pact starts as a web app. No extension, native mobile app, CLI product or WhatsA
 The remote branch `feat/speclock-mvp` contains earlier SpecLock code. Do not treat its authorization/QC flow as the Pact implementation. [The migration assessment](docs/pact/04-architecture.md#existing-code) identifies reusable candidates and incompatible assumptions. This documentation branch starts from `main` and leaves that implementation intact.
 
 Target stack: TypeScript, React/Next.js, PostgreSQL, private attachment storage, one model provider, PayPal sandbox and Render hosting. Exact dependency versions are selected and locked during implementation. APIMatic/Postman may help development; other sponsors are outside the committed scope.
+
+## MCP prototype
+
+The [`mcp-server/`](mcp-server/README.md) folder contains a local stdio MCP server for reading a synthetic Pact job and saving evidence-backed amendment drafts for merchant review. AI interpretation happens in the connected host; deterministic checks validate revision freshness, editable fields and exact source quotes. The server cannot approve or publish amendments, message customers, or initiate payments. It is a tested prototype adapter, not the completed app, an authenticated multi-user service, or a PayPal integration.
+
+```sh
+cd mcp-server
+npm install
+npm test
+npm run typecheck
+npm start
+```
 
 ## Repository checks available now
 
