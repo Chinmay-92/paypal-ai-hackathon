@@ -97,16 +97,16 @@ export async function listJobs(actor: MerchantActor): Promise<JobListItem[]> {
   return rows.map((r) => {
     let filter: JobListItem["filter"];
     let next: string;
-    if (r.fulfillment_state === "EXCEPTION") [filter, next] = ["exception", "Merchant: resolve late change"];
-    else if (r.open_requests > 0 || r.review > 0) [filter, next] = ["needs_review", "Merchant: review request"];
-    else if (r.pending_number !== null) [filter, next] = ["awaiting_customer", "Customer: approve or decline"];
-    else if (r.unsettled > 0) [filter, next] = ["awaiting_payment", "System: confirming payment"];
-    else if (r.due_minor > 0) [filter, next] = ["awaiting_payment", "Customer: pay deposit"];
-    else if (r.current_number === null) [filter, next] = ["draft", "Merchant: publish agreement"];
-    else if (r.fulfillment_state === "READY") [filter, next] = ["ready", "Team: start work"];
-    else if (r.fulfillment_state === "IN_PROGRESS") [filter, next] = ["in_progress", "Team: complete work"];
-    else if (r.fulfillment_state === "COMPLETED") [filter, next] = ["completed", "None"];
-    else [filter, next] = ["needs_review", "Merchant: release work"];
+    if (r.fulfillment_state === "EXCEPTION") [filter, next] = ["exception", "Decide on a late change"];
+    else if (r.open_requests > 0 || r.review > 0) [filter, next] = ["needs_review", "Review the change request"];
+    else if (r.pending_number !== null) [filter, next] = ["awaiting_customer", "Customer is reviewing the proposal"];
+    else if (r.unsettled > 0) [filter, next] = ["awaiting_payment", "PayPal is confirming a payment"];
+    else if (r.due_minor > 0) [filter, next] = ["awaiting_payment", "Customer to pay"];
+    else if (r.current_number === null) [filter, next] = ["draft", "Send the agreement"];
+    else if (r.fulfillment_state === "READY") [filter, next] = ["ready", "Ready to start production"];
+    else if (r.fulfillment_state === "IN_PROGRESS") [filter, next] = ["in_progress", "In production"];
+    else if (r.fulfillment_state === "COMPLETED") [filter, next] = ["completed", "Complete"];
+    else [filter, next] = ["needs_review", "Release work when ready"];
     return {
       id: r.id,
       title: r.title,

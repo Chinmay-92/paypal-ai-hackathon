@@ -1,9 +1,10 @@
 import { portalView } from "@/application/reviews";
-import { ValueView } from "@/ui/ValueView";
 import { paymentsConfigured } from "@/integrations/paypal/http";
 import { currentCustomer } from "@/server/http";
 import { Badge } from "@/ui/Badge";
+import { Brand } from "@/ui/Brand";
 import { label, money, when } from "@/ui/format";
+import { ValueView } from "@/ui/ValueView";
 import { AskQuestion, CheckStatus, Decision, PayButton } from "./PortalActions";
 
 export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
@@ -13,9 +14,9 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
   if (!actor || actor.jobId !== jobId) {
     return (
       <div className="portal">
-        <main id="main">
+        <main id="main" className="narrow">
           <h1>Open your review link</h1>
-          <p>This page needs the review link the business sent you. Links expire; ask the business for a new one if needed.</p>
+          <p>This page needs the review link the business sent you. Links expire, so ask the business for a new one if needed.</p>
         </main>
       </div>
     );
@@ -23,153 +24,195 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
   const v = await portalView(actor);
   const tz = v.job.timezone;
   const fields = v.template.fields;
+  const payable = v.obligations.find((o) => ["DUE", "PROCESSING", "FAILED"].includes(o.status));
+  const checking = v.obligations.find((o) => ["UNKNOWN", "PENDING"].includes(o.status));
+  const firstName = v.customerName.replace(/\s*\(synthetic\)/, "").split(" ")[0];
+  const needsPaymentAfter = (v.pendingTerms?.dueNowMinor ?? 0) > 0;
+
   return (
     <div className="portal">
       <header className="topbar">
-        <span className="brand">{v.merchant.name}</span>
-        <span className="sandbox-flag">Sandbox demo · no real money</span>
+        <Brand href={null} name={v.merchant.name.replace(/\s*\(synthetic demo\)/, "")} />
+        <span className="spacer" />
+        <span className="sandbox-flag">Sandbox demo, no real money</span>
       </header>
-      <main id="main" className="stack">
-        <div>
-          <h1>{v.job.title}</h1>
-          <p className="muted small">
-            For {v.customerName}. Amounts in {v.job.currency}. Times in {tz}.
-          </p>
-        </div>
-        {v.linkReplaced && <div className="notice warn">This proposal has been replaced. Review the current version.</div>}
-        {checkout === "cancelled" && <div className="notice info">You left PayPal without paying. Nothing was charged.</div>}
-        {v.job.startedAt && v.pending && <div className="notice warn">Work has started. The shop must confirm whether this change is possible.</div>}
+      <main id="main">
+        <p className="muted small" style={{ marginBottom: "0.25rem" }}>
+          {v.job.title}
+        </p>
 
-        {v.pending && v.pendingTerms && (
-          <section className="panel" aria-labelledby="proposal-h">
-            <h2 id="proposal-h">
-              {v.effective ? `Proposed change: revision ${v.pending.number}` : `Agreement for review: revision ${v.pending.number}`}
-            </h2>
-            {v.effective ? (
-              v.diff.length > 0 ? (
-                <table className="diff">
-                  <caption className="sr-only">What changes</caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Item</th>
-                      <th scope="col">Now</th>
-                      <th scope="col">Proposed</th>
-                    </tr>
-                  </thead>
+        {v.linkReplaced && <div className="notice warn">This proposal has been replaced. Review the current version below.</div>}
+        {checkout === "cancelled" && <div className="notice info">You left PayPal without paying. Nothing was charged.</div>}
+
+        {v.pending && v.pendingTerms ? (
+          <section aria-labelledby="proposal-h">
+            <p className="portal-step">{needsPaymentAfter ? "Step 1 of 2" : "Your decision"}</p>
+            <h1 id="proposal-h">{v.effective ? `Review the change to your order` : `Review your agreement`}</h1>
+            <p className="muted">
+              Hi {firstName}. {v.effective ? `${v.merchant.name.replace(/\s*\(synthetic demo\)/, "")} has updated the agreement. Here is exactly what changes.` : "Please check the details and price."}
+            </p>
+            {v.job.startedAt && <div className="notice warn">Work has started. The shop must confirm whether this change is possible.</div>}
+            <div className="panel">
+              {v.effective ? (
+                v.diff.length > 0 ? (
+                  <table className="diff">
+                    <caption className="sr-only">What changes</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">What</th>
+                        <th scope="col">Now</th>
+                        <th scope="col">New</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {v.diff.map((d) => (
+                        <tr key={d.path}>
+                          <th scope="row">{d.label}</th>
+                          <td className="old">
+                            <span className="sr-only">currently </span>
+                            <del>
+                              <ValueView value={d.oldValue} labels={v.artworkLabels} />
+                            </del>
+                          </td>
+                          <td>
+                            <span className="sr-only">changes to </span>
+                            <ins>
+                              <ValueView value={d.newValue} labels={v.artworkLabels} />
+                            </ins>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p>The details are unchanged; the price or terms changed.</p>
+                )
+              ) : (
+                <table>
                   <tbody>
-                    {v.diff.map((d) => (
-                      <tr key={d.path}>
-                        <th scope="row">{d.label}</th>
-                        <td className="old">
-                          <span className="sr-only">currently </span>
-                          <del>
-                            <ValueView value={d.oldValue} labels={v.artworkLabels} />
-                          </del>
-                        </td>
-                        <td className="new">
-                          <span className="sr-only">changes to </span>
-                          <ins>
-                            <ValueView value={d.newValue} labels={v.artworkLabels} />
-                          </ins>
+                    {fields.map((f) => (
+                      <tr key={f.path}>
+                        <th scope="row">{f.label}</th>
+                        <td>
+                          <ValueView value={v.pending!.content.scope[f.path]} labels={v.artworkLabels} />
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              ) : (
-                <p>The scope is unchanged; the price or terms changed.</p>
-              )
-            ) : (
-              <dl className="kv">
-                {fields.map((f) => (
-                  <div key={f.path} style={{ display: "contents" }}>
-                    <dt>{f.label}</dt>
-                    <dd>
-                      <ValueView value={v.pending!.content.scope[f.path]} labels={v.artworkLabels} />
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            )}
-            <h3 style={{ marginTop: "1rem" }}>Price</h3>
-            <table>
-              <tbody>
-                {v.pending.content.lineItems.map((i) => (
-                  <tr key={i.description}>
-                    <td>
-                      {i.description} × {i.quantity}
-                    </td>
-                    <td className="num">{money(i.quantity * i.unitPriceMinor)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <dl className="kv" style={{ marginTop: "0.75rem" }}>
-              <dt>New total</dt>
-              <dd>
-                {money(v.pendingTerms.totalMinor)} {v.effective && <span className="muted small">(was {money(v.effective.total_minor)})</span>}
-              </dd>
-              <dt>Deposit required ({v.pending.content.depositBps / 100}%)</dt>
-              <dd>{money(v.pendingTerms.depositTargetMinor)}</dd>
-              <dt>Already paid</dt>
-              <dd>{money(v.pendingTerms.previouslyPaidMinor)}</dd>
-              <dt className="strong">Due after you approve</dt>
-              <dd className="strong">{money(v.pendingTerms.dueNowMinor)}</dd>
-              <dt>Remaining balance later</dt>
-              <dd>{money(v.pendingTerms.remainingAfterDepositMinor)}</dd>
-            </dl>
-            {v.pending.content.terms.merchantNote && <p className="small">Note from the business: {v.pending.content.terms.merchantNote}</p>}
-            <p className="small muted">
-              Terms {v.pending.content.terms.version}: work starts only after the deposit for this revision is received. Payments already received for this job count toward it. Approving records
-              your decision on this exact revision; it is not a qualified electronic signature and does not waive your legal rights.
+              )}
+
+              <div className="section">
+                <h2>Price</h2>
+                <table>
+                  <tbody>
+                    {v.pending.content.lineItems.map((i) => (
+                      <tr key={i.description}>
+                        <td>
+                          {i.description} × {i.quantity}
+                        </td>
+                        <td className="num">{money(i.quantity * i.unitPriceMinor)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <dl className="kv" style={{ marginTop: "0.75rem" }}>
+                  <dt>{v.effective ? "New total" : "Total"}</dt>
+                  <dd>
+                    {money(v.pendingTerms.totalMinor)}
+                    {v.effective && <span className="muted small"> (was {money(v.effective.total_minor)})</span>}
+                  </dd>
+                  <dt>Deposit ({v.pending.content.depositBps / 100}%)</dt>
+                  <dd>{money(v.pendingTerms.depositTargetMinor)}</dd>
+                  <dt>Already paid</dt>
+                  <dd>{money(v.pendingTerms.previouslyPaidMinor)}</dd>
+                  <span className="rule" />
+                  <dt className="strong">To pay after you approve</dt>
+                  <dd className="strong">{money(v.pendingTerms.dueNowMinor)}</dd>
+                  <dt>Rest, paid later</dt>
+                  <dd>{money(v.pendingTerms.remainingAfterDepositMinor)}</dd>
+                </dl>
+                {v.pending.content.terms.merchantNote && <p className="small" style={{ marginTop: "0.75rem" }}>Note from the business: {v.pending.content.terms.merchantNote}</p>}
+              </div>
+
+              <div className="section">
+                <Decision revisionId={v.pending.id} contentHash={v.pending.content_hash} dueNowMinor={v.pendingTerms.dueNowMinor} isChange={v.effective !== null} />
+                <p className="small muted" style={{ marginTop: "0.75rem", marginBottom: 0 }}>
+                  Work starts only after the deposit for this version is received. Payments you have already made count toward it. Approving records your decision on this exact version; it is not a
+                  legal signature and does not affect your consumer rights.
+                </p>
+              </div>
+            </div>
+          </section>
+        ) : payable ? (
+          <section aria-labelledby="pay-h">
+            <p className="portal-step">{v.decisions.length > 1 || v.creditedMinor > 0 ? "Step 2 of 2" : "Last step"}</p>
+            <h1 id="pay-h">Pay your {label(payable.purpose).toLowerCase()}</h1>
+            <div className="panel">
+              <p className="money-big">{money(payable.amount_minor)}</p>
+              <p className="muted">
+                {payable.purpose === "BALANCE" ? "The remaining balance for your order." : "Work starts once this is received."} You approve the payment on PayPal; nothing is charged automatically.
+              </p>
+              {paymentsConfigured() ? <PayButton obligationId={payable.id} amountMinor={payable.amount_minor} /> : <p className="notice warn">Payments are not configured on this demo server.</p>}
+              {payable.status === "PROCESSING" && (
+                <div style={{ marginTop: "0.75rem" }}>
+                  <CheckStatus obligationId={payable.id} />
+                </div>
+              )}
+            </div>
+          </section>
+        ) : checking ? (
+          <section>
+            <p className="portal-step">Payment</p>
+            <h1>We are confirming your payment</h1>
+            <div className="panel">
+              <p role="status">{checking.status === "PENDING" ? "Payment is pending at PayPal. Work has not been released yet." : "We are checking the payment result. Do not pay again yet."}</p>
+              <CheckStatus obligationId={checking.id} />
+            </div>
+          </section>
+        ) : (
+          <section>
+            <p className="portal-step">All set</p>
+            <h1>Nothing is needed from you</h1>
+            <p className="muted">
+              {v.job.fulfillmentState === "IN_PROGRESS" ? "Your order is in production." : v.job.fulfillmentState === "COMPLETED" ? "Your order is complete." : "The business has everything it needs. We'll show any new step here."}
             </p>
-            <Decision revisionId={v.pending.id} contentHash={v.pending.content_hash} dueNowMinor={v.pendingTerms.dueNowMinor} />
           </section>
         )}
 
-        {v.obligations.length > 0 && (
-          <section className="panel" aria-labelledby="pay-h">
-            <h2 id="pay-h">Payment</h2>
-            {v.obligations.map((o) => (
-              <div key={o.id} className="stack">
-                <p>
-                  {label(o.purpose)}: <strong>{money(o.amount_minor)}</strong> <Badge status={o.status} />
-                </p>
-                {o.status === "UNKNOWN" && <p role="status">We are checking the payment result. Do not pay again yet.</p>}
-                {o.status === "PENDING" && <p role="status">Payment is pending. Work has not been released.</p>}
-                {["DUE", "PROCESSING", "FAILED"].includes(o.status) &&
-                  (paymentsConfigured() ? <PayButton obligationId={o.id} amountMinor={o.amount_minor} /> : <p className="notice warn">Payments are not configured on this demo server.</p>)}
-                {["UNKNOWN", "PENDING", "PROCESSING"].includes(o.status) && <CheckStatus obligationId={o.id} />}
-              </div>
-            ))}
-            <p className="small muted">Each payment is a separate PayPal checkout you approve yourself. Nothing is charged automatically.</p>
-          </section>
-        )}
         {v.reviewPayments.length > 0 && (
-          <div className="notice warn">A payment you made arrived after the proposal was replaced. The business will review it with you; it has been recorded and not lost.</div>
+          <div className="notice warn">A payment you made arrived after the proposal was replaced. It is recorded and safe; the business will review it with you.</div>
         )}
 
         {v.effective && (
-          <section className="panel">
-            <h2>
-              Current agreement: revision {v.effective.number} <Badge status="CUSTOMER_APPROVED" text="Approved" />
-            </h2>
-            <dl className="kv">
-              {fields.map((f) => (
-                <div key={f.path} style={{ display: "contents" }}>
-                  <dt>{f.label}</dt>
-                  <dd>
-                    <ValueView value={v.effective!.content.scope[f.path]} labels={v.artworkLabels} />
-                  </dd>
-                </div>
-              ))}
-              <dt>Total</dt>
-              <dd>{money(v.effective.total_minor)}</dd>
-              <dt>Paid so far</dt>
-              <dd>{money(v.creditedMinor)}</dd>
-            </dl>
-            <p className="small muted">Approved {when(v.effective.decided_at, tz)}.</p>
-          </section>
+          <details className="panel">
+            <summary>
+              Your current agreement (version {v.effective.number}) <Badge status="CUSTOMER_APPROVED" text="Approved" />
+            </summary>
+            <table style={{ marginTop: "0.75rem" }}>
+              <tbody>
+                {fields.map((f) => (
+                  <tr key={f.path}>
+                    <th scope="row">{f.label}</th>
+                    <td>
+                      <ValueView value={v.effective!.content.scope[f.path]} labels={v.artworkLabels} />
+                    </td>
+                  </tr>
+                ))}
+                <tr>
+                  <th scope="row">Total</th>
+                  <td>{money(v.effective.total_minor)}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Paid so far</th>
+                  <td>{money(v.creditedMinor)}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p className="small muted" style={{ margin: "0.75rem 0 0" }}>
+              Approved {when(v.effective.decided_at, tz)}. Amounts in {v.job.currency}.
+            </p>
+          </details>
         )}
 
         <AskQuestion />

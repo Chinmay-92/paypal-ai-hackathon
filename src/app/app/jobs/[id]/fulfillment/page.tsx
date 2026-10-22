@@ -10,9 +10,9 @@ export default async function FulfillmentPage(props: PageProps<"/app/jobs/[id]/f
   const s = await fulfillmentSheet(await currentMerchant(), id);
   return (
     <div className="sheet" style={{ maxWidth: 800 }}>
-      <p className="no-print">
-        <Link href={`/app/jobs/${id}`}>← Back to job</Link>
-      </p>
+      <Link className="back no-print" href={`/app/jobs/${id}`}>
+        ← Back to job
+      </Link>
       <div className="row" style={{ justifyContent: "space-between" }}>
         <h1>Job sheet: {s.job.title}</h1>
         <PrintButton />

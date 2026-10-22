@@ -119,6 +119,7 @@ export function ChangeReview(props: {
         Proposed by {cr.extractor?.startsWith("model:") ? `model (${cr.extractor.slice(6)})` : "deterministic baseline"}. A proposal is not a decision: you set prices and publish.
       </p>
       {!props.baseIsCurrent && <div className="notice warn">This request was analyzed against an earlier revision. Reject it or edit the agreement manually.</div>}
+      <h3 className="review-step">1. Check what Pact found</h3>
       {proposal?.rationale && <p>{proposal.rationale}</p>}
 
       {proposal && proposal.proposedChanges.length > 0 && (
@@ -201,9 +202,11 @@ export function ChangeReview(props: {
               </button>
             </p>
           )}
-          <h3 style={{ marginTop: "1rem" }}>Final scope</h3>
+          <h3 className="review-step">2. Fill in what&apos;s missing</h3>
+          <p className="small muted">Proposed values are filled in. Anything marked unresolved must be answered before the customer can see it.</p>
           <ScopeEditor fields={props.fields} scope={scope} onChange={setScope} artwork={props.artwork} highlight={supported.map((c) => c.field)} idPrefix={`cr-${cr.id}`} />
-          <h3>Price (merchant decision)</h3>
+          <h3 className="review-step">3. Set the price</h3>
+          <p className="small muted">From your rate card. Pact never sets prices; change anything you need.</p>
           <LineItemsEditor items={items} onChange={setItems} idPrefix={`cr-li-${cr.id}`} onSuggest={() => setItems(TEMPLATES[domain].suggestLineItems(scope, rateCard))} />
           <div className="field" style={{ marginTop: "0.75rem", maxWidth: 240 }}>
             <label htmlFor={`dep-${cr.id}`}>Deposit (%)</label>
@@ -222,16 +225,19 @@ export function ChangeReview(props: {
               {error.items.length > 0 && <ul>{error.items.map((i) => <li key={i}>{i}</li>)}</ul>}
             </div>
           )}
-          <div className="row">
-            <button className="primary" type="submit" disabled={busy}>
+          <div className="row" style={{ marginTop: "0.5rem" }}>
+            <button className="primary big" type="submit" disabled={busy}>
               Create draft revision
             </button>
+            <span className="small muted">You will see the customer&apos;s view before anything is sent.</span>
           </div>
         </form>
       )}
       {props.canEdit && (
+        <details className="section">
+          <summary>Reject this request instead</summary>
         <form
-          style={{ marginTop: "1rem" }}
+          style={{ marginTop: "0.75rem" }}
           onSubmit={(e) => {
             e.preventDefault();
             void submit({ decision: "reject", note });
@@ -247,6 +253,7 @@ export function ChangeReview(props: {
             Reject request
           </button>
         </form>
+        </details>
       )}
       {!props.canEdit && <p className="small muted">Publish or discard the current draft before accepting another request.</p>}
     </div>

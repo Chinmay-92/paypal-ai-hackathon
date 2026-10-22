@@ -34,6 +34,7 @@ Pact starts as a web app. No extension, native mobile app, CLI product or WhatsA
 11. [Evidence and decisions](docs/pact/11-evidence-decisions.md)
 12. [Operations and implementation handoff](docs/pact/12-operations.md)
 13. [Submission draft (not submitted)](docs/pact/13-submission-draft.md)
+14. [Owner checklist: steps only the owner can do](docs/pact/14-owner-checklist.md)
 
 [Machine-readable demonstration fixtures](fixtures/pact/scenarios.json) contain synthetic examples and expected outcomes. They are not customer records. [AI evaluation cases](fixtures/pact/ai-cases.json) define the initial evaluation contract.
 
@@ -98,6 +99,7 @@ Working locally:
 - Customer portal: see the diff and money effect, then approve or decline that exact revision and content hash. Stale proposals and replaced links are refused.
 - Separate buyer-approved PayPal Orders v2 CAPTURE checkouts for the deposit, additional deposit and balance. Durable operations with stable `PayPal-Request-Id`s. Lost responses become UNKNOWN and are reconciled. Payments for a replaced revision become REVIEW_REQUIRED and need an explicit credit or refund decision. Merchant-reviewed partial refunds use reserved capacity. Webhooks are verified, deduplicated and re-read from the provider.
 - Readiness blockers, merchant release, started-work exceptions, manual holds, printable job sheet and history timeline.
+- Guided interface. Each job shows a six-step progress track, one "next step" with its action, tabbed sections and a money/readiness sidebar. Jobs are grouped by who needs to act. The customer page walks through one decision at a time. Changes are shown as a redline (old struck through, new underlined), and layouts work at phone width.
 
 Verified against the real PayPal sandbox on 2026-10-22, driven through the app UI with a sandbox buyer account (synthetic apparel job):
 

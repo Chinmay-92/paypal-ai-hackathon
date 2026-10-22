@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { one, pool } from "@/persistence/db";
 import { currentMerchant } from "@/server/http";
+import { Brand } from "@/ui/Brand";
 import { SignOut } from "./SignOut";
 
 export default async function MerchantLayout({ children }: { children: React.ReactNode }) {
@@ -11,17 +12,15 @@ export default async function MerchantLayout({ children }: { children: React.Rea
   return (
     <>
       <header className="topbar">
-        <Link className="brand" href="/app/jobs">
-          Pact<span>.</span>
-        </Link>
+        <Brand href="/app/jobs" />
         <span className="sandbox-flag">PayPal sandbox</span>
         <nav aria-label="Workspace">
           <Link href="/app/jobs">Jobs</Link>
           {actor.role === "owner" && <Link href="/app/jobs/new">New job</Link>}
         </nav>
         <span className="spacer" />
-        <span className="muted small">
-          {tenant?.name} · {actor.name}
+        <span className="muted small who-am-i">
+          {actor.name}, {tenant?.name}
         </span>
         <SignOut />
       </header>

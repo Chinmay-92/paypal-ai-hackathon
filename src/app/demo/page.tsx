@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { demoModeEnabled } from "@/server/demo";
+import { Brand } from "@/ui/Brand";
 import { DemoLauncher } from "./DemoLauncher";
 
 export default async function DemoPage() {
@@ -9,10 +10,8 @@ export default async function DemoPage() {
   return (
     <>
       <header className="topbar">
-        <span className="brand">
-          Pact<span>.</span>
-        </span>
-        <span className="sandbox-flag">PayPal sandbox · synthetic data</span>
+        <Brand />
+        <span className="sandbox-flag">PayPal sandbox, synthetic data</span>
       </header>
       <main id="main" className="narrow stack">
         <h1>Try Pact</h1>

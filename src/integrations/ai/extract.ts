@@ -27,7 +27,8 @@ export async function extractProposal(input: ExtractionInput): Promise<Extractio
     const { proposal, issues } = validateModelProposal(raw, input);
     return { proposal, issues, extractor: `model:${meta.model}`, meta: { ...meta, inputHash: inputHash(input) } };
   } catch (err) {
-    if (!(err instanceof ModelUnavailableError)) throw err;
-    return runBaseline(input, { reason: "model unavailable", modelError: err.message, promptVersion: PROMPT_VERSION });
+    // Any model failure falls back: proposals never depend on the model being up.
+    const message = err instanceof Error ? err.message.slice(0, 300) : String(err);
+    return runBaseline(input, { reason: err instanceof ModelUnavailableError ? "model unavailable" : "model error", modelError: message, promptVersion: PROMPT_VERSION });
   }
 }
