@@ -6,16 +6,17 @@ import {
   audit,
   expectVersion,
   getRevision,
-  loadCatalog,
+  loadJobCatalog,
   lockJob,
   newId,
   updateJob,
   type ChangeRequestRow,
   type JobRow,
   type MessageRow,
+  ATTACHMENT_PREFIX,
 } from "@/persistence/repo";
 import { auditActor, requireOwner, type CustomerActor, type MerchantActor, type SystemActor } from "./actors";
-import { ConflictError, NotFoundError } from "./errors";
+import { ConflictError, NotFoundError, UnprocessableError } from "./errors";
 import { insertDraft } from "./revisions";
 import type { AddMessageInput, ReviewChangeInput } from "./schemas";
 import { sha256 } from "./tokens";
@@ -55,6 +56,17 @@ export async function addMessage(
         actor.kind === "merchant" ? actor.userId : null,
       ],
     );
+    const attachmentIds = [...new Set(input.attachmentIds ?? [])];
+    if (attachmentIds.length) {
+      // Only unlinked files of this job; a customer may only attach files they uploaded.
+      const linked = await tx.query(
+        `UPDATE attachments SET message_id = $1 WHERE tenant_id = $2 AND job_id = $3 AND id = ANY($4) AND message_id IS NULL
+         AND ($5::text IS NULL OR uploaded_by_kind = $5) RETURNING id`,
+        [messageId, job.tenant_id, job.id, attachmentIds, actor.kind === "customer" ? "customer" : null],
+      );
+      if (linked.rowCount !== attachmentIds.length) throw new UnprocessableError("One of the attached files is not available for this message");
+      await tx.query("UPDATE source_messages SET attachment_ids = $2 WHERE id = $1", [messageId, attachmentIds]);
+    }
     const changeRequestId = newId();
     await tx.query(
       `INSERT INTO change_requests (id, tenant_id, job_id, base_revision_id, source_ids, status) VALUES ($1, $2, $3, $4, $5, 'ANALYZING')`,
@@ -70,7 +82,7 @@ export async function addMessage(
       jobId: job.id,
       ...a,
       action: "message.received",
-      details: { messageId, provenance, authorRole: input.authorRole, changeRequestId },
+      details: { messageId, provenance, authorRole: input.authorRole, changeRequestId, attachments: input.attachmentIds?.length ?? 0 },
     });
     await updateJob(tx, job, {});
     return { messageId, changeRequestId };
@@ -94,7 +106,7 @@ export async function analyzeChangeRequest(actor: SystemActor, changeRequestId: 
   if (cr.status !== "ANALYZING") return cr;
   const job = await one<JobRow>(db, "SELECT * FROM jobs WHERE tenant_id = $1 AND id = $2", [actor.tenantId, cr.job_id]);
   const base = await getRevision(db, actor.tenantId, cr.base_revision_id);
-  const catalog = await loadCatalog(db, actor.tenantId, job!.domain);
+  const catalog = await loadJobCatalog(db, job!);
   const newest = await many<MessageRow>(db, "SELECT * FROM source_messages WHERE tenant_id = $1 AND id = ANY($2)", [actor.tenantId, cr.source_ids]);
   const context = await many<MessageRow>(
     db,
@@ -102,7 +114,21 @@ export async function analyzeChangeRequest(actor: SystemActor, changeRequestId: 
      ORDER BY created_at DESC LIMIT ${CONTEXT_MESSAGES}`,
     [actor.tenantId, cr.job_id, newest[0]?.created_at ?? new Date(), cr.source_ids],
   );
-  const sources = [...context.reverse(), ...newest].map((m) => ({ id: m.id, authorLabel: m.author_label, authorRole: m.author_role, body: m.body }));
+  const ordered = [...context.reverse(), ...newest];
+  const files = await many<{ id: string; message_id: string; filename: string; content_type: string }>(
+    db,
+    "SELECT id, message_id, filename, content_type FROM attachments WHERE tenant_id = $1 AND message_id = ANY($2) ORDER BY created_at",
+    [actor.tenantId, ordered.map((m) => m.id)],
+  );
+  const sources = ordered.map((m) => ({
+    id: m.id,
+    authorLabel: m.author_label,
+    authorRole: m.author_role,
+    body: m.body,
+    attachments: files
+      .filter((f) => f.message_id === m.id)
+      .map((f) => ({ id: f.content_type.startsWith("image/") ? `${ATTACHMENT_PREFIX}${f.id}` : null, filename: f.filename, contentType: f.content_type })),
+  }));
   const result = await extractProposal({ baseRevisionId: base.id, domain: job!.domain, scope: base.content.scope, catalog, sources });
 
   return withTx(async (tx) => {

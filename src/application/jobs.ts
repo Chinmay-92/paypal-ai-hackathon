@@ -11,13 +11,14 @@ import {
   listOperations,
   listRefunds,
   listRevisions,
-  loadCatalog,
+  loadJobCatalog,
   newId,
   type ChangeRequestRow,
   type JobRow,
   type MessageRow,
 } from "@/persistence/repo";
 import { requireOwner, type MerchantActor } from "./actors";
+import { listAttachments } from "./attachments";
 import { readiness } from "./ledger";
 import { insertDraft } from "./revisions";
 import type { CreateJobInput } from "./schemas";
@@ -145,8 +146,9 @@ export async function merchantJobView(actor: MerchantActor, jobId: string) {
       "SELECT id, actor_type, actor_id, action, details, created_at FROM audit_events WHERE tenant_id = $1 AND job_id = $2 ORDER BY id",
       [actor.tenantId, jobId],
     ),
-    loadCatalog(db, actor.tenantId, job.domain),
+    loadJobCatalog(db, job),
   ]);
+  const attachments = await listAttachments(actor.tenantId, jobId);
   const effective = revisions.find((r) => r.id === job.effective_revision_id) ?? null;
   const pending = revisions.find((r) => r.id === job.pending_revision_id) ?? null;
   const draft = revisions.find((r) => r.status === "DRAFT") ?? null;
@@ -162,6 +164,7 @@ export async function merchantJobView(actor: MerchantActor, jobId: string) {
     draft,
     draftProblems: draft ? publishProblems(draft.content, catalog) : [],
     messages,
+    attachments,
     changeRequests,
     obligations,
     operations,

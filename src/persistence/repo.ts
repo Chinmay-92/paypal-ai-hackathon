@@ -141,6 +141,7 @@ export type MessageRow = {
   body: string;
   provenance: "user_supplied" | "portal_authenticated";
   content_hash: string;
+  attachment_ids: string[];
   created_at: Date;
 };
 
@@ -248,6 +249,29 @@ export async function loadCatalog(db: Db, tenantId: string, domain: Domain): Pro
       .filter((r) => r.kind === "rate")
       .map((r) => ({ code: r.code, description: r.label, unitPriceMinor: r.unit_price_minor ?? 0 })),
     artwork: rows.filter((r) => r.kind === "artwork").map((r) => ({ id: r.code, label: r.label })),
+  };
+}
+
+/** Artwork value prefix for a job's uploaded images, e.g. "att:<uuid>". */
+export const ATTACHMENT_PREFIX = "att:";
+
+/**
+ * The merchant catalog plus images uploaded to this job, which become
+ * selectable artwork for this job only.
+ */
+export async function loadJobCatalog(db: Db, job: { tenant_id: string; id: string; domain: Domain }): Promise<Catalog> {
+  const base = await loadCatalog(db, job.tenant_id, job.domain);
+  const files = await many<{ id: string; filename: string; uploaded_by_kind: string }>(
+    db,
+    "SELECT id, filename, uploaded_by_kind FROM attachments WHERE tenant_id = $1 AND job_id = $2 AND content_type LIKE 'image/%' ORDER BY created_at",
+    [job.tenant_id, job.id],
+  );
+  return {
+    ...base,
+    artwork: [
+      ...base.artwork,
+      ...files.map((f) => ({ id: `${ATTACHMENT_PREFIX}${f.id}`, label: `${f.filename} (uploaded by ${f.uploaded_by_kind === "customer" ? "customer" : "business"})` })),
+    ],
   };
 }
 

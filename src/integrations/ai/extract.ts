@@ -1,5 +1,6 @@
 import { sha256 } from "@/application/tokens";
 import { baselineExtract } from "./baseline";
+import { baselineOriginal } from "./original";
 import type { ExtractionInput, ExtractionResult } from "./contract";
 import { modelConfigured, modelExtract, ModelUnavailableError, PROMPT_VERSION } from "./model";
 import { validateModelProposal, validateProposal } from "./validate";
@@ -10,7 +11,8 @@ export function inputHash(input: ExtractionInput): string {
 
 export function runBaseline(input: ExtractionInput, meta: Record<string, unknown> = {}): ExtractionResult {
   const started = Date.now();
-  const { proposal, issues } = validateProposal(baselineExtract(input), input);
+  const raw = input.mode === "original" ? baselineOriginal(input) : baselineExtract(input);
+  const { proposal, issues } = validateProposal(raw, input);
   return { proposal, issues, extractor: "baseline", meta: { ...meta, inputHash: inputHash(input), latencyMs: Date.now() - started } };
 }
 

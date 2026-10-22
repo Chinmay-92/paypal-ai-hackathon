@@ -1,5 +1,5 @@
 import { portalView } from "@/application/reviews";
-import { formatScopeValue } from "@/domain/templates";
+import { ValueView } from "@/ui/ValueView";
 import { paymentsConfigured } from "@/integrations/paypal/http";
 import { currentCustomer } from "@/server/http";
 import { Badge } from "@/ui/Badge";
@@ -62,11 +62,15 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
                         <th scope="row">{d.label}</th>
                         <td className="old">
                           <span className="sr-only">currently </span>
-                          <del>{formatScopeValue(d.oldValue)}</del>
+                          <del>
+                            <ValueView value={d.oldValue} labels={v.artworkLabels} />
+                          </del>
                         </td>
                         <td className="new">
                           <span className="sr-only">changes to </span>
-                          <ins>{formatScopeValue(d.newValue)}</ins>
+                          <ins>
+                            <ValueView value={d.newValue} labels={v.artworkLabels} />
+                          </ins>
                         </td>
                       </tr>
                     ))}
@@ -80,7 +84,9 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
                 {fields.map((f) => (
                   <div key={f.path} style={{ display: "contents" }}>
                     <dt>{f.label}</dt>
-                    <dd>{formatScopeValue(v.pending!.content.scope[f.path])}</dd>
+                    <dd>
+                      <ValueView value={v.pending!.content.scope[f.path]} labels={v.artworkLabels} />
+                    </dd>
                   </div>
                 ))}
               </dl>
@@ -152,7 +158,9 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
               {fields.map((f) => (
                 <div key={f.path} style={{ display: "contents" }}>
                   <dt>{f.label}</dt>
-                  <dd>{formatScopeValue(v.effective!.content.scope[f.path])}</dd>
+                  <dd>
+                    <ValueView value={v.effective!.content.scope[f.path]} labels={v.artworkLabels} />
+                  </dd>
                 </div>
               ))}
               <dt>Total</dt>

@@ -2,12 +2,13 @@ import Link from "next/link";
 import { proposalOf } from "@/application/changes";
 import { merchantJobView } from "@/application/jobs";
 import { scopeDiff } from "@/domain/revision";
-import { formatScopeValue } from "@/domain/templates";
 import { paymentsConfigured } from "@/integrations/paypal/http";
 import { currentMerchant } from "@/server/http";
 import { ActionButton } from "@/ui/ActionButton";
 import { Badge } from "@/ui/Badge";
 import { label, money, when } from "@/ui/format";
+import { FileUpload } from "./FileUpload";
+import { labelsOf, ValueView } from "@/ui/ValueView";
 import { ChangeReview } from "./ChangeReview";
 import { ManualAmendment } from "./ManualAmendment";
 import { MessageForm } from "./MessageForm";
@@ -43,6 +44,8 @@ export default async function JobPage(props: PageProps<"/app/jobs/[id]">) {
   const otherCrs = v.changeRequests.filter((c) => !openCrs.includes(c));
   const blockerCodes = v.readiness.blockers.map((b) => b.code);
   const started = v.job.started_at !== null;
+  const labels = labelsOf(v.catalog.artwork);
+  const fileName = new Map(v.attachments.map((a) => [a.id, a]));
 
   return (
     <>
@@ -86,8 +89,37 @@ export default async function JobPage(props: PageProps<"/app/jobs/[id]">) {
               <p>
                 <Highlighted text={m.body} spans={spansByMessage.get(m.id) ?? []} />
               </p>
+              {m.attachment_ids.length > 0 && (
+                <p className="small">
+                  Attached:{" "}
+                  {m.attachment_ids.map((id) => (
+                    <a key={id} href={`/api/attachments/${id}`} target="_blank" rel="noopener" style={{ marginRight: "0.5rem" }}>
+                      {fileName.get(id)?.filename ?? "file"}
+                    </a>
+                  ))}
+                </p>
+              )}
             </div>
           ))}
+          {v.attachments.length > 0 && (
+            <div style={{ marginTop: "0.75rem" }}>
+              <h3>Files</h3>
+              <ul className="small">
+                {v.attachments.map((a) => (
+                  <li key={a.id}>
+                    <a href={`/api/attachments/${a.id}`} target="_blank" rel="noopener">
+                      {a.filename}
+                    </a>{" "}
+                    <span className="muted">
+                      {a.content_type.replace("image/", "").replace("application/", "").toUpperCase()} · {Math.ceil(a.size_bytes / 1024)} KB · from {a.uploaded_by_kind === "customer" ? "customer" : "business"} · sha256 <code>{a.sha256.slice(0, 10)}</code>
+                    </span>
+                    {a.content_type.startsWith("image/") && <span className="badge accent">Selectable as artwork</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {owner && base && <FileUpload jobId={id} />}
           {owner && base && <MessageForm jobId={id} customerName={v.customer.name} />}
           {!base && <p className="muted small">Publish the original agreement before adding correspondence.</p>}
         </section>
@@ -100,9 +132,9 @@ export default async function JobPage(props: PageProps<"/app/jobs/[id]">) {
           {v.draft && (
             <div className="panel">
               <h2>
-                Draft revision R{v.draft.number} <Badge status="DRAFT" />
+                {base ? `Draft revision R${v.draft.number}` : `Draft original agreement R${v.draft.number}`} <Badge status="DRAFT" />
               </h2>
-              <DiffTable fields={fields} before={base?.content.scope ?? {}} after={v.draft.content.scope} domain={v.job.domain} />
+              <DiffTable fields={fields} before={base?.content.scope ?? {}} after={v.draft.content.scope} domain={v.job.domain} labels={labels} />
               <p>
                 Total <strong>{money(v.draft.total_minor)}</strong> {base && <span className="muted">(was {money(base.total_minor)})</span>} · deposit {v.draft.content.depositBps / 100}%
               </p>
@@ -131,12 +163,12 @@ export default async function JobPage(props: PageProps<"/app/jobs/[id]">) {
           {v.pending && (
             <div className="panel">
               <h2>
-                R{v.pending.number} awaiting customer <Badge status="PUBLISHED" text="Awaiting decision" />
+                {v.effective ? `R${v.pending.number} awaiting customer` : `Original agreement R${v.pending.number} awaiting customer`} <Badge status="PUBLISHED" text="Awaiting decision" />
               </h2>
               <p className="small muted">
                 Published {when(v.pending.published_at, tz)}. Content hash <code>{v.pending.content_hash.slice(0, 12)}</code>.
               </p>
-              <DiffTable fields={fields} before={v.effective?.content.scope ?? {}} after={v.pending.content.scope} domain={v.job.domain} />
+              <DiffTable fields={fields} before={v.effective?.content.scope ?? {}} after={v.pending.content.scope} domain={v.job.domain} labels={labels} />
               {owner && <ReissueLink jobId={id} />}
             </div>
           )}
@@ -154,6 +186,7 @@ export default async function JobPage(props: PageProps<"/app/jobs/[id]">) {
               domain={v.job.domain}
               rateCard={v.catalog.rateCard}
               artwork={v.catalog.artwork}
+              labels={labels}
               depositBps={base?.content.depositBps ?? 5000}
               started={started}
               canEdit={owner && !v.draft}
@@ -344,7 +377,39 @@ export default async function JobPage(props: PageProps<"/app/jobs/[id]">) {
   );
 }
 
-function DiffTable({ fields, before, after, domain }: { fields: readonly { path: string; label: string }[]; before: Record<string, unknown>; after: Record<string, unknown>; domain: "apparel" | "website" }) {
+function DiffTable({
+  fields,
+  before,
+  after,
+  domain,
+  labels,
+}: {
+  fields: readonly { path: string; label: string }[];
+  before: Record<string, unknown>;
+  after: Record<string, unknown>;
+  domain: "apparel" | "website";
+  labels: Record<string, string>;
+}) {
+  if (Object.keys(before).length === 0) {
+    // Original agreement: nothing to compare against, so list the agreed values.
+    return (
+      <div className="table-wrap">
+        <table>
+          <caption className="sr-only">Agreement terms</caption>
+          <tbody>
+            {fields.map((f) => (
+              <tr key={f.path}>
+                <th scope="row">{f.label}</th>
+                <td>
+                  <ValueView value={after[f.path] as never} labels={labels} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
   const diff = scopeDiff(domain, before as never, after as never);
   if (diff.length === 0) return <p className="muted small">No scope changes (price or terms only).</p>;
   return (
@@ -364,11 +429,15 @@ function DiffTable({ fields, before, after, domain }: { fields: readonly { path:
               <th scope="row">{fields.find((f) => f.path === d.path)?.label ?? d.path}</th>
               <td className="old">
                 <span className="sr-only">was </span>
-                <del>{formatScopeValue(d.oldValue)}</del>
+                <del>
+                  <ValueView value={d.oldValue} labels={labels} />
+                </del>
               </td>
               <td className="new">
                 <span className="sr-only">becomes </span>
-                <ins>{formatScopeValue(d.newValue)}</ins>
+                <ins>
+                  <ValueView value={d.newValue} labels={labels} />
+                </ins>
               </td>
             </tr>
           ))}

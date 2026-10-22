@@ -9,9 +9,9 @@ export async function POST(req: NextRequest) {
     req,
     async () => {
       const actor = await currentCustomer();
-      const { body } = await parseBody(req, PortalMessageInput);
+      const { body, attachmentIds } = await parseBody(req, PortalMessageInput);
       const customer = await one<{ name: string }>(pool(), "SELECT name FROM customers WHERE tenant_id = $1 AND id = $2", [actor.tenantId, actor.customerId]);
-      const result = await addMessage(actor, actor.jobId, { authorLabel: customer?.name ?? "Customer", authorRole: "customer", body });
+      const result = await addMessage(actor, actor.jobId, { authorLabel: customer?.name ?? "Customer", authorRole: "customer", body, attachmentIds });
       await processAnalysisOutbox(3).catch(() => undefined);
       return { messageId: result.messageId };
     },

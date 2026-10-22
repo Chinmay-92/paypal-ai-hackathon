@@ -1,7 +1,7 @@
 import { formatScopeValue } from "@/domain/revision";
 import { template } from "@/domain/templates";
 import { pool, withTx } from "@/persistence/db";
-import { audit, expectVersion, getJob, getRevision, lockJob, updateJob } from "@/persistence/repo";
+import { audit, expectVersion, getJob, getRevision, loadJobCatalog, lockJob, updateJob } from "@/persistence/repo";
 import { requireOwner, type MerchantActor } from "./actors";
 import { ConflictError } from "./errors";
 import { readiness } from "./ledger";
@@ -67,10 +67,16 @@ export async function fulfillmentSheet(actor: MerchantActor, jobId: string) {
   const effective = job.effective_revision_id ? await getRevision(db, actor.tenantId, job.effective_revision_id) : null;
   const ready = await readiness(db, job, effective);
   const t = template(job.domain);
+  const labels = Object.fromEntries((await loadJobCatalog(db, job)).artwork.map((a) => [a.id, a.label]));
   return {
     job: { id: job.id, title: job.title, domain: job.domain, state: job.fulfillment_state, version: job.version, releasedAt: job.released_at, startedAt: job.started_at, timezone: job.timezone },
     revision: effective ? { id: effective.id, number: effective.number, contentHash: effective.content_hash, approvedAt: effective.decided_at } : null,
-    lines: effective ? t.fields.map((f) => ({ label: f.label, value: formatScopeValue(effective.content.scope[f.path] ?? null) })) : [],
+    lines: effective
+      ? t.fields.map((f) => {
+          const raw = effective.content.scope[f.path] ?? null;
+          return { label: f.label, value: formatScopeValue(raw, labels), attachmentId: typeof raw === "string" && raw.startsWith("att:") ? raw.slice(4) : null };
+        })
+      : [],
     items: effective ? effective.content.lineItems.map((i) => ({ description: i.description, quantity: i.quantity })) : [],
     actionable: job.fulfillment_state === "READY" || job.fulfillment_state === "IN_PROGRESS",
     blockers: ready.blockers,

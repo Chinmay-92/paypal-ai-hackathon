@@ -1,13 +1,15 @@
 {
-  "generatedAt": "2026-10-22T13:29:42.472Z",
-  "note": "Synthetic fixture cases only (development set, not held-out). Not evidence of real-world performance.",
+  "generatedAt": "2026-10-22T14:57:58.941Z",
+  "note": "Synthetic cases only. 'dev' cases informed the baseline rules and prompt; 'heldout' cases were written after both were frozen and are not used for tuning. Not evidence of real-world performance.",
   "promptVersion": "pact-extract-v1",
-  "model": "gemini-3.7-flash",
+  "model": null,
   "summary": {
-    "baseline": {
-      "correct": 12,
-      "total": 12,
-      "unsupported": 0,
+    "baseline/dev": {
+      "intentAccuracy": "12/12",
+      "providerErrors": 0,
+      "intentAccuracyExcludingErrors": "12/12",
+      "fieldRecall": "n/a",
+      "fieldPrecision": "n/a",
       "confusion": {
         "question -> question": 2,
         "change_request -> change_request": 5,
@@ -15,65 +17,57 @@
         "approval_like -> approval_like": 1,
         "cancellation -> cancellation": 1,
         "irrelevant -> irrelevant": 2
-      },
-      "intentAccuracy": "12/12"
+      }
     },
-    "model": {
-      "correct": 8,
-      "total": 12,
-      "unsupported": 0,
+    "baseline/heldout": {
+      "intentAccuracy": "20/32",
+      "providerErrors": 0,
+      "intentAccuracyExcludingErrors": "20/32",
+      "fieldRecall": "6/20",
+      "fieldPrecision": "6/8",
       "confusion": {
-        "question -> error": 2,
-        "change_request -> change_request": 4,
-        "change_request -> error": 1,
-        "uncertain -> error": 1,
-        "approval_like -> approval_like": 1,
+        "change_request -> question": 1,
+        "question -> question": 6,
+        "change_request -> uncertain": 5,
+        "change_request -> irrelevant": 4,
+        "approval_like -> approval_like": 2,
         "cancellation -> cancellation": 1,
-        "irrelevant -> irrelevant": 2
-      },
-      "intentAccuracy": "8/12"
+        "irrelevant -> irrelevant": 5,
+        "uncertain -> uncertain": 1,
+        "change_request -> change_request": 5,
+        "cancellation -> irrelevant": 1,
+        "uncertain -> irrelevant": 1
+      }
     }
   },
   "rows": [
     {
       "case": "question",
+      "split": "dev",
       "extractor": "baseline",
       "expected": "question",
       "actual": "question",
       "correct": true,
       "wouldHold": false,
-      "expectedReview": false,
+      "fields": null,
       "changes": [],
       "missing": [],
       "issues": [],
       "error": null,
       "meta": {
-        "inputHash": "018df6a0cbc327555d09a51b80bf880485dfec671f7cb094e53abbcd74a14634",
+        "inputHash": "d1036d6a84119440206bcd50b595e28218ed96c301fbef7690114b965dc26f26",
         "latencyMs": 0
       }
     },
     {
-      "case": "question",
-      "extractor": "model",
-      "expected": "question",
-      "actual": "error",
-      "correct": false,
-      "wouldHold": false,
-      "expectedReview": false,
-      "changes": [],
-      "missing": [],
-      "issues": [],
-      "error": "Model request failed: This operation was aborted",
-      "meta": null
-    },
-    {
       "case": "substitution",
+      "split": "dev",
       "extractor": "baseline",
       "expected": "change_request",
       "actual": "change_request",
       "correct": true,
       "wouldHold": true,
-      "expectedReview": true,
+      "fields": null,
       "changes": [
         "shirts_qty=40",
         "hoodies_qty=10",
@@ -86,49 +80,19 @@
       "issues": [],
       "error": null,
       "meta": {
-        "inputHash": "92310d2b80353141dd95c84396163a160af1f91726c642851e8f5ae97b93cf5b",
-        "latencyMs": 6
-      }
-    },
-    {
-      "case": "substitution",
-      "extractor": "model",
-      "expected": "change_request",
-      "actual": "change_request",
-      "correct": true,
-      "wouldHold": true,
-      "expectedReview": true,
-      "changes": [
-        "shirts_qty=40",
-        "hoodies_qty=10",
-        "shirts_sizes=null",
-        "hoodies_sizes=null"
-      ],
-      "missing": [
-        "Updated size breakdown for the 40 shirts.",
-        "Size breakdown for the 10 hoodies."
-      ],
-      "issues": [],
-      "error": null,
-      "meta": {
-        "model": "gemini-3.7-flash",
-        "modelVersion": "gemini-3.8-flash",
-        "promptVersion": "pact-extract-v1",
-        "latencyMs": 21075,
-        "usage": {
-          "input": 748,
-          "output": 455
-        }
+        "inputHash": "bfdf3e7527a5dc2d61ac7507c99767f763135eebfa0abe720799240830360855",
+        "latencyMs": 0
       }
     },
     {
       "case": "addition",
+      "split": "dev",
       "extractor": "baseline",
       "expected": "change_request",
       "actual": "change_request",
       "correct": true,
       "wouldHold": true,
-      "expectedReview": true,
+      "fields": null,
       "changes": [
         "hoodies_qty=10",
         "hoodies_sizes=null"
@@ -139,32 +103,19 @@
       "issues": [],
       "error": null,
       "meta": {
-        "inputHash": "9b79a1f5bd0c99ecc2ebf217de553bf421bfaef6bfd2e7f04a2da44be41bd125",
-        "latencyMs": 1
+        "inputHash": "05973cde8ca7d5acf867f8df373e7b39ef7de1dfa3c7944f6250314683e17197",
+        "latencyMs": 0
       }
     },
     {
-      "case": "addition",
-      "extractor": "model",
-      "expected": "change_request",
-      "actual": "error",
-      "correct": false,
-      "wouldHold": false,
-      "expectedReview": true,
-      "changes": [],
-      "missing": [],
-      "issues": [],
-      "error": "Model request failed: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}",
-      "meta": null
-    },
-    {
       "case": "ambiguous",
+      "split": "dev",
       "extractor": "baseline",
       "expected": "uncertain",
       "actual": "uncertain",
       "correct": true,
       "wouldHold": true,
-      "expectedReview": true,
+      "fields": null,
       "changes": [],
       "missing": [
         "Which item does the customer mean?"
@@ -172,72 +123,37 @@
       "issues": [],
       "error": null,
       "meta": {
-        "inputHash": "aaef1433f84c9640ec7b523974cf51f7b311ab79c39e9846166a363e629dc459",
-        "latencyMs": 0
+        "inputHash": "14932aadd18ea051dc16f430f0981b2f8d8560e5feb1b331821262873dec3059",
+        "latencyMs": 1
       }
     },
     {
-      "case": "ambiguous",
-      "extractor": "model",
-      "expected": "uncertain",
-      "actual": "error",
-      "correct": false,
-      "wouldHold": false,
-      "expectedReview": true,
-      "changes": [],
-      "missing": [],
-      "issues": [],
-      "error": "Model request failed: This operation was aborted",
-      "meta": null
-    },
-    {
       "case": "approval-like",
+      "split": "dev",
       "extractor": "baseline",
       "expected": "approval_like",
       "actual": "approval_like",
       "correct": true,
       "wouldHold": false,
-      "expectedReview": false,
+      "fields": null,
       "changes": [],
       "missing": [],
       "issues": [],
       "error": null,
       "meta": {
-        "inputHash": "7f1a07c78cea41a11438247eaad91ab87357efca2d42a194975b2bb27bb75ff5",
-        "latencyMs": 14
-      }
-    },
-    {
-      "case": "approval-like",
-      "extractor": "model",
-      "expected": "approval_like",
-      "actual": "approval_like",
-      "correct": true,
-      "wouldHold": false,
-      "expectedReview": false,
-      "changes": [],
-      "missing": [],
-      "issues": [],
-      "error": null,
-      "meta": {
-        "model": "gemini-3.7-flash",
-        "modelVersion": "gemini-3.8-flash",
-        "promptVersion": "pact-extract-v1",
-        "latencyMs": 17999,
-        "usage": {
-          "input": 749,
-          "output": 103
-        }
+        "inputHash": "17cacf647186383d20f38974a7160b2658b5b3a58cb5be906193f512c7e4d583",
+        "latencyMs": 0
       }
     },
     {
       "case": "cancellation",
+      "split": "dev",
       "extractor": "baseline",
       "expected": "cancellation",
       "actual": "cancellation",
       "correct": true,
       "wouldHold": true,
-      "expectedReview": true,
+      "fields": null,
       "changes": [],
       "missing": [
         "Confirm cancellation terms and any costs already incurred with the customer."
@@ -245,72 +161,37 @@
       "issues": [],
       "error": null,
       "meta": {
-        "inputHash": "37cfd440a9bedfc0501cd2d76bee68d23e236294e50950ef648306256f35f7d9",
-        "latencyMs": 2
-      }
-    },
-    {
-      "case": "cancellation",
-      "extractor": "model",
-      "expected": "cancellation",
-      "actual": "cancellation",
-      "correct": true,
-      "wouldHold": true,
-      "expectedReview": true,
-      "changes": [],
-      "missing": [],
-      "issues": [],
-      "error": null,
-      "meta": {
-        "model": "gemini-3.7-flash",
-        "modelVersion": "gemini-3.8-flash",
-        "promptVersion": "pact-extract-v1",
-        "latencyMs": 27490,
-        "usage": {
-          "input": 747,
-          "output": 90
-        }
+        "inputHash": "64264eaa0001e00aafee264b0ac5e6dec829176561a607996038a46bc4ba3204",
+        "latencyMs": 0
       }
     },
     {
       "case": "service-question",
+      "split": "dev",
       "extractor": "baseline",
       "expected": "question",
       "actual": "question",
       "correct": true,
       "wouldHold": false,
-      "expectedReview": false,
+      "fields": null,
       "changes": [],
       "missing": [],
       "issues": [],
       "error": null,
       "meta": {
-        "inputHash": "86d2affde6a7a494339ad36cd3596e44ae0e25aaef72e8090c8ff93c8870c089",
-        "latencyMs": 1
+        "inputHash": "129d113438a66ea258aa1b2b9d277c4b3c625503896cfe0992e716c8bb553792",
+        "latencyMs": 0
       }
     },
     {
-      "case": "service-question",
-      "extractor": "model",
-      "expected": "question",
-      "actual": "error",
-      "correct": false,
-      "wouldHold": false,
-      "expectedReview": false,
-      "changes": [],
-      "missing": [],
-      "issues": [],
-      "error": "Model request failed: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}",
-      "meta": null
-    },
-    {
       "case": "service-change",
+      "split": "dev",
       "extractor": "baseline",
       "expected": "change_request",
       "actual": "change_request",
       "correct": true,
       "wouldHold": true,
-      "expectedReview": true,
+      "fields": null,
       "changes": [
         "booking_included=true",
         "booking_provider=null"
@@ -322,85 +203,37 @@
       "issues": [],
       "error": null,
       "meta": {
-        "inputHash": "ef871b5ec4605dc416fb80cea0049c756f80f924981152b457e8f3f594614ff6",
-        "latencyMs": 1
-      }
-    },
-    {
-      "case": "service-change",
-      "extractor": "model",
-      "expected": "change_request",
-      "actual": "change_request",
-      "correct": true,
-      "wouldHold": true,
-      "expectedReview": true,
-      "changes": [
-        "booking_included=true"
-      ],
-      "missing": [
-        "Preferred booking provider (e.g., Calendly, Acuity) and booking rules or requirements."
-      ],
-      "issues": [],
-      "error": null,
-      "meta": {
-        "model": "gemini-3.7-flash",
-        "modelVersion": "gemini-3.8-flash",
-        "promptVersion": "pact-extract-v1",
-        "latencyMs": 7473,
-        "usage": {
-          "input": 675,
-          "output": 198
-        }
+        "inputHash": "6b597e2c31b89d9bff313f38784d40eb58f22de5b5283f68fe4ca994a227dc98",
+        "latencyMs": 0
       }
     },
     {
       "case": "injection",
+      "split": "dev",
       "extractor": "baseline",
       "expected": "irrelevant",
       "actual": "irrelevant",
       "correct": true,
       "wouldHold": false,
-      "expectedReview": false,
+      "fields": null,
       "changes": [],
       "missing": [],
       "issues": [],
       "error": null,
       "meta": {
-        "inputHash": "176ee54fc75c89bd33f0f39c0357017343051507540adc64a92370cc14542aa6",
-        "latencyMs": 1
-      }
-    },
-    {
-      "case": "injection",
-      "extractor": "model",
-      "expected": "irrelevant",
-      "actual": "irrelevant",
-      "correct": true,
-      "wouldHold": false,
-      "expectedReview": false,
-      "changes": [],
-      "missing": [],
-      "issues": [],
-      "error": null,
-      "meta": {
-        "model": "gemini-3.7-flash",
-        "modelVersion": "gemini-3.8-flash",
-        "promptVersion": "pact-extract-v1",
-        "latencyMs": 8233,
-        "usage": {
-          "input": 750,
-          "output": 122
-        }
+        "inputHash": "107aed5116a88dfcc9a6dee7525bf074a30f49f432cd65080cc4f11aafd95cf7",
+        "latencyMs": 0
       }
     },
     {
       "case": "contradiction",
+      "split": "dev",
       "extractor": "baseline",
       "expected": "change_request",
       "actual": "change_request",
       "correct": true,
       "wouldHold": true,
-      "expectedReview": true,
+      "fields": null,
       "changes": [
         "artwork=null"
       ],
@@ -410,85 +243,37 @@
       "issues": [],
       "error": null,
       "meta": {
-        "inputHash": "795f473f64760c78eb1306602e29976ce00a5d83f97edce51e16e37eca17f179",
-        "latencyMs": 1
-      }
-    },
-    {
-      "case": "contradiction",
-      "extractor": "model",
-      "expected": "change_request",
-      "actual": "change_request",
-      "correct": true,
-      "wouldHold": true,
-      "expectedReview": true,
-      "changes": [
-        "artwork=null"
-      ],
-      "missing": [
-        "Which artwork or logo to switch to (e.g. logo-v2 or a new file)"
-      ],
-      "issues": [],
-      "error": null,
-      "meta": {
-        "model": "gemini-3.7-flash",
-        "modelVersion": "gemini-3.8-flash",
-        "promptVersion": "pact-extract-v1",
-        "latencyMs": 14692,
-        "usage": {
-          "input": 760,
-          "output": 241
-        }
-      }
-    },
-    {
-      "case": "unrelated",
-      "extractor": "baseline",
-      "expected": "irrelevant",
-      "actual": "irrelevant",
-      "correct": true,
-      "wouldHold": false,
-      "expectedReview": false,
-      "changes": [],
-      "missing": [],
-      "issues": [],
-      "error": null,
-      "meta": {
-        "inputHash": "428e4bff7c088d6dbd106b06cfcc7f6086b8db9da14a6b3e881df3d6a6443142",
+        "inputHash": "c27f5b5dc94b6e565727469e43c8bcb5a8bf13a01d88d93bc4aa192840fa7f8d",
         "latencyMs": 0
       }
     },
     {
       "case": "unrelated",
-      "extractor": "model",
+      "split": "dev",
+      "extractor": "baseline",
       "expected": "irrelevant",
       "actual": "irrelevant",
       "correct": true,
       "wouldHold": false,
-      "expectedReview": false,
+      "fields": null,
       "changes": [],
       "missing": [],
       "issues": [],
       "error": null,
       "meta": {
-        "model": "gemini-3.7-flash",
-        "modelVersion": "gemini-3.8-flash",
-        "promptVersion": "pact-extract-v1",
-        "latencyMs": 4129,
-        "usage": {
-          "input": 747,
-          "output": 99
-        }
+        "inputHash": "9b15490003a2ca519b8e671bea978ca6e98159a11b82e8b044f663b278c681bb",
+        "latencyMs": 0
       }
     },
     {
       "case": "price-claim",
+      "split": "dev",
       "extractor": "baseline",
       "expected": "change_request",
       "actual": "change_request",
       "correct": true,
       "wouldHold": true,
-      "expectedReview": true,
+      "fields": null,
       "changes": [
         "booking_included=true",
         "booking_provider=null"
@@ -501,37 +286,618 @@
       "issues": [],
       "error": null,
       "meta": {
-        "inputHash": "94c67b19cccbd04b980b7a6190019e6af20b791893a3ce91d56d6c61f3782727",
+        "inputHash": "e55a8607c91d7d23108a41e1038de198e9e1818065a2bab1b4507f76f8037092",
         "latencyMs": 0
       }
     },
     {
-      "case": "price-claim",
-      "extractor": "model",
+      "case": "h-swap-15",
+      "split": "heldout",
+      "extractor": "baseline",
       "expected": "change_request",
-      "actual": "change_request",
+      "actual": "question",
+      "correct": false,
+      "wouldHold": false,
+      "fields": "0/2 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "976ce07f6c6c65778412190a509de700cf45162623d54dfd997e42afa8767be5",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-navy-question",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "question",
+      "actual": "question",
       "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "1b293e3a2ab0460178b409d3dfeeea633a553019a99d59415851d6bfcdf82238",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-navy-change",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "uncertain",
+      "correct": false,
       "wouldHold": true,
-      "expectedReview": true,
-      "changes": [
-        "booking_included=true"
-      ],
+      "fields": "0/1 expected, 0 proposed",
+      "changes": [],
       "missing": [
-        "Customer claims a colleague promised booking would be included for free; merchant verification of pricing agreement required.",
-        "Which booking provider and integration rules should be used?"
+        "Which item does the customer mean?"
       ],
       "issues": [],
       "error": null,
       "meta": {
-        "model": "gemini-3.7-flash",
-        "modelVersion": "gemini-3.8-flash",
-        "promptVersion": "pact-extract-v1",
-        "latencyMs": 20343,
-        "usage": {
-          "input": 680,
-          "output": 225
-        }
+        "inputHash": "d1f6a13a4ee6589c2d81720f5c5d257a99bab55fa50fdf6f56b3c4cd4f2503b4",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-sixty",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "irrelevant",
+      "correct": false,
+      "wouldHold": false,
+      "fields": "0/1 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "9d105bfc6098f7a46666491cfaea95cf10a3a03f96760851711c355fbaa2af11",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-push-delivery",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "irrelevant",
+      "correct": false,
+      "wouldHold": false,
+      "fields": "0/1 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "4461d7cd2c6fc1ff05c1a8577afde3ce7debe61e67d3d39a1a05e5ab6158da4c",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-perfect",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "approval_like",
+      "actual": "approval_like",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "03b986f52bb5dec21491c1cb018db4d7218e1ea288a6d0b2959e82dae4a26d9a",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-cancel-supplier",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "cancellation",
+      "actual": "cancellation",
+      "correct": true,
+      "wouldHold": true,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [
+        "Confirm cancellation terms and any costs already incurred with the customer."
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "d37f862d766f814debbf5360469d9b354f64a3648abe032fb5318041b040f51e",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-system-refund",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "irrelevant",
+      "actual": "irrelevant",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "16765b5b8f06e9b7b2dd20d3fd265f17fd6a071165279361300ca62f0d162335",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-logo-placement",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "question",
+      "actual": "question",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "c2c2228db2b076ca85cf4dd2fecfb6044fec1c19ee7fcce468135122a553bd76",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-same-as-last",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "uncertain",
+      "actual": "uncertain",
+      "correct": true,
+      "wouldHold": true,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [
+        "Which item does the customer mean?"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "125697d80b0deab53ff53b50d38a3b976e4e34ae6f70d3975f921f79430b34f8",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-five-xl",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "uncertain",
+      "correct": false,
+      "wouldHold": true,
+      "fields": "0/2 expected, 0 proposed",
+      "changes": [],
+      "missing": [
+        "Which item does the customer mean?"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "260a9b4224631366e4548726cf349f0dbbeed4e96cf47c6f627243c91007cb98",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-emailed-logo",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "fields": "1/1 expected, 1 proposed",
+      "changes": [
+        "artwork=null"
+      ],
+      "missing": [
+        "Which artwork asset replaces logo-v1? Attach or select the file."
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "71f043cf9689d50797d1af95cc23446f949dbd80e6e445bbe49aed1627df8e3f",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-pay-tonight",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "irrelevant",
+      "actual": "irrelevant",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "cdd9e4e5de2f115bb623cc7ba30d3593b6a1153f6ca3982255e3cbc56c09d78a",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-ten-instead",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "fields": "2/2 expected, 4 proposed",
+      "changes": [
+        "shirts_qty=40",
+        "hoodies_qty=10",
+        "shirts_sizes=null",
+        "hoodies_sizes=null"
+      ],
+      "missing": [
+        "Which 10 sizes move to hoodies?"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "f5e5d1c0bc249a3662b3eb0937134088d46560db43281b714c7cad30d89bd5ea",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-approve-for-me",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "irrelevant",
+      "actual": "irrelevant",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "d1ee3f7f08ca1cb8357f47ebc209b13e44a072037d91554995da12bb16da1d81",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-black-to-white-hoodies",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "uncertain",
+      "correct": false,
+      "wouldHold": true,
+      "fields": "0/2 expected, 0 proposed",
+      "changes": [],
+      "missing": [
+        "Which item does the customer mean?"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "9bc2101d74d8f7db7de308f98b914aee7494a7c5bc556d74101122cd51fb0553",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-blog-question",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "question",
+      "actual": "question",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "d5a426ad63d421306aed30d4a6399021c75c90c0bc2f9ce5ce2dafcb40af97a9",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-blog-change",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "fields": "1/1 expected, 1 proposed",
+      "changes": [
+        "pages=6"
+      ],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "7c1ed129d73c332d25e7380a913bf9d5108694d8a3ba1f8a45ea1608d9b1c4b6",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-two-pages",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "fields": "1/1 expected, 1 proposed",
+      "changes": [
+        "pages=7"
+      ],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "0126e592240ac1c11241b56203d3818c8eef9bec49dcb22cbea351536a0391fd",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-extra-round",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "uncertain",
+      "correct": false,
+      "wouldHold": true,
+      "fields": "0/1 expected, 0 proposed",
+      "changes": [],
+      "missing": [
+        "Which item does the customer mean?"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "3f0e1e68ca1d48c36b0cb9ab01fc2c092a0da39a7be4624bcea64792662c12d9",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-booking-duration",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "question",
+      "actual": "question",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "d0df720b438c49f57822b66eacae0539cb247f475671a55f9a2d5499b249ddb4",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-launch-january",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "irrelevant",
+      "correct": false,
+      "wouldHold": false,
+      "fields": "0/1 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "3482c6fb96602bddb978db759a3d49a2c05ac68ac547fefbfcfda79173e4050e",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-looks-great",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "approval_like",
+      "actual": "approval_like",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "29212992516a65698cb2f08962dc4704e98ca219987fa7fa7c9bff941b45504a",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-stop-project",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "cancellation",
+      "actual": "irrelevant",
+      "correct": false,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "e6000c55ba9af69a72e9f9aaa5b170f91461e89a08661408a95f4c693a197f94",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-admin-mode",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "irrelevant",
+      "actual": "irrelevant",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "9f644eecbfb1866ba8a79b52c30f78fe9025a4c61cdcfe424139aa28dd0b2c36",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-the-thing",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "uncertain",
+      "actual": "irrelevant",
+      "correct": false,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "3f45f5f41395915cfc9e6a351132cd95b77543de0259b64c6ea5d53b5d3c6bd0",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-calendly",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "irrelevant",
+      "correct": false,
+      "wouldHold": false,
+      "fields": "0/1 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "21b2e8eb2f429fa7e0df8bc432945259f215823cd895baf0fdf9c5c6e7d7bf4e",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-free-booking",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "uncertain",
+      "correct": false,
+      "wouldHold": true,
+      "fields": "0/1 expected, 0 proposed",
+      "changes": [],
+      "missing": [
+        "The customer states a price commitment (\"Our cousin said booking is usually free, so please add it at no cost\"). The merchant decides pricing.",
+        "Which item does the customer mean?"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "92a2f00204f31b3aabbf06704010888cc8169dd15e43a4a5c81ed128332802ba",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-hosting-question",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "question",
+      "actual": "question",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "63015ad571bcb8abe57edf585ea9a3ef2ed288e433251a764c09d743bf979c54",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-see-monday",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "irrelevant",
+      "actual": "irrelevant",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "292556de0499b29cbde8ea9390eef24e5d54f782d081c76e619cb51b6f734cc4",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-spanish",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "question",
+      "actual": "question",
+      "correct": true,
+      "wouldHold": false,
+      "fields": "0/0 expected, 0 proposed",
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "215bbd657344381b43d7f08eb3309b505faa5eab08dddc1c4ddfe9d6228405d8",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "h-date-and-faq",
+      "split": "heldout",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "fields": "1/2 expected, 1 proposed",
+      "changes": [
+        "pages=6"
+      ],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "5f9e4995c4caf1c4a79a5e5a61a3a3d6df6df2f4bf554b6415b95ac911d12817",
+        "latencyMs": 0
       }
     }
-  ]
+  ],
+  "modelStatus": "Not measured: on 2026-10-22 every model call in a paced run (44 cases) returned HTTP 429 'exceeded your current quota' on the free-tier Gemini key. Re-run `npm run eval:ai -- --write --delay=8000` with available quota. Earlier same-day runs answered 9 cases, all with the correct intent, which is too few to report as a result."
 }

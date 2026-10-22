@@ -33,6 +33,7 @@ Pact starts as a web app. No extension, native mobile app, CLI product or WhatsA
 10. [Demo and submission](docs/pact/10-demo-submission.md)
 11. [Evidence and decisions](docs/pact/11-evidence-decisions.md)
 12. [Operations and implementation handoff](docs/pact/12-operations.md)
+13. [Submission draft (not submitted)](docs/pact/13-submission-draft.md)
 
 [Machine-readable demonstration fixtures](fixtures/pact/scenarios.json) contain synthetic examples and expected outcomes. They are not customer records. [AI evaluation cases](fixtures/pact/ai-cases.json) define the initial evaluation contract.
 
@@ -90,8 +91,9 @@ Last verified 2026-10-22 on branch `feat/pact-app`.
 Working locally:
 
 - Merchant login with hashed sessions and tenant-scoped queries; owner and fulfillment roles. Customer review links are stored hashed and swapped for a short job-scoped session.
-- Apparel and website templates on one engine. Merchant rate cards and artwork catalogs. Original agreement entered manually, then published.
-- Message intake (pasted or portal) → outbox analysis → validated proposal with citations. Gemini (`gemini-3.7-flash`) with fallback to a deterministic baseline. Literal-quote, field, catalog and base-revision checks. Questions, approval-like wording and injected instructions cannot change the agreement.
+- Apparel and website templates on one engine, with merchant rate cards and artwork catalogs. The original agreement is entered manually or proposed from a pasted quote or thread: cited values the merchant reviews before saving. Nothing is stored until then.
+- Private attachments (PNG, JPEG, WebP, PDF; up to 5 MB, type checked from the bytes; no SVG). They can be added by the merchant or from the customer portal, can travel with a message, and are served only to the tenant or that job's customer. An uploaded image becomes selectable artwork for that job, so "use the attached logo" proposes that exact file.
+- Message intake (pasted or portal) → outbox analysis → validated proposal with citations. Gemini `gemini-3.7-flash`, retried once on `gemini-3.5-flash` when overloaded or rate-limited, then the deterministic baseline. Literal-quote, field, catalog and base-revision checks. Questions, approval-like wording and injected instructions cannot change the agreement.
 - Merchant review: resolve missing fields, set prices, create a draft, publish an immutable revision. Database triggers enforce revision immutability and an append-only audit log.
 - Customer portal: see the diff and money effect, then approve or decline that exact revision and content hash. Stale proposals and replaced links are refused.
 - Separate buyer-approved PayPal Orders v2 CAPTURE checkouts for the deposit, additional deposit and balance. Durable operations with stable `PayPal-Request-Id`s. Lost responses become UNKNOWN and are reconciled. Payments for a replaced revision become REVIEW_REQUIRED and need an explicit credit or refund decision. Merchant-reviewed partial refunds use reserved capacity. Webhooks are verified, deduplicated and re-read from the provider.
@@ -108,7 +110,7 @@ Verified against the real PayPal sandbox on 2026-10-22, driven through the app U
 
 Webhook setup: add `https://<public-url>/api/paypal/webhook` to the sandbox app, subscribe it to `CHECKOUT.ORDER.APPROVED` and `PAYMENT.CAPTURE.*`, and put its ID in `PAYPAL_WEBHOOK_ID`. Unsigned or unverifiable events are rejected with 400. A hosted deployment needs a stable URL; quick tunnels change on restart.
 
-Not implemented yet: attachment upload and storage (artwork is chosen from catalog IDs), creating the original agreement from extraction, email notifications, a verified hosted deployment (the Render Blueprint exists but has not been deployed), backup/restore test, held-out AI evaluation set (only 12 development cases exist), real-user replay. See [decisions](docs/pact/11-evidence-decisions.md) D11–D20 for deviations from the blueprint.
+Not implemented yet: email notifications, separate object storage (attachments live in PostgreSQL for now), a verified hosted deployment (the Render Blueprint exists but has not been deployed), backup/restore test, real-user replay. The AI evaluation has 44 synthetic cases (12 dev, 32 held-out); see `reports/ai-eval-latest.json`. See [decisions](docs/pact/11-evidence-decisions.md) D11–D20 for deviations from the blueprint.
 
 ## Hackathon
 
