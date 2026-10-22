@@ -28,7 +28,23 @@ Research accessed October 19–20, 2026. Evidence is not an endorsement of vendo
 - D07: Initial explicit upload/paste/portal intake. WhatsApp/email connectors later and only through authorized routes.
 - D08: Preserve historical docs and SpecLock code branch; current Pact blueprint supersedes their product direction.
 - D09: Immutable published revisions, independent funding/fulfillment states and durable operation recovery.
-- D10: This branch contains documentation, fixtures and documentation checks only.
+- D10: The documentation branch contained documentation, fixtures and documentation checks only. Superseded by the implementation on `feat/pact-app` (D11 onwards).
+
+## Implementation decisions and deviations (2026-10-22)
+
+- D11: Pinned stack: Next.js 16.4.2, React 19.3.0, pg 8.23.1, zod 4.6.7, @google/genai 2.30.0, Vitest 5. Model: `gemini-3.7-flash` (`gemini-2.5-flash` is no longer offered to new keys). Override it with `GEMINI_MODEL`; every proposal records the model ID, model version and prompt version.
+- D12: Revision states drop MERCHANT_REVIEW. The single editable DRAFT is the merchant review state. Database triggers enforce immutability after publish.
+- D13: Added a local funding state, CANCELLED, for an unpaid obligation whose revision was replaced. NOT_REQUIRED is used when credited funding already covers a deposit. Neither is a PayPal status.
+- D14: Carry-forward rule: completed payments already credited to the job count toward a newly approved revision. This is disclosed in the revision terms (`creditsPriorPayments`), and the amounts shown are snapshotted in `approvals.disclosed_terms`. A payment captured against a replaced revision is never credited automatically. It becomes REVIEW_REQUIRED until the merchant credits it or refunds it.
+- D15: A record in another tenant returns 404, so its existence is not disclosed. Role violations inside a tenant return 403.
+- D16: CSRF protection checks the Origin header on cookie-authenticated writes, plus SameSite=Lax cookies. Rate limits are per process, so a multi-instance deployment needs a shared store.
+- D17: A verified CHECKOUT.ORDER.APPROVED webhook may trigger a server-side capture, because the buyer explicitly approved that order. The capture still re-reads the order and checks the amount, reference and payee.
+- D18: An unexpected error during a provider call is recorded as UNKNOWN, never FAILED. Only a definitive 4xx rejection retires an order.
+- D19: Attachments are not implemented yet. Artwork changes reference merchant catalog IDs, and a message such as "use the attached logo" proposes an unresolved artwork value. This is a P0 gap.
+- D20: The original agreement is entered manually. Creating it from a reviewed extraction is not implemented yet (P0 gap).
+- D21: Render Blueprint (`render.yaml`) on small paid plans (web `0.5c-512mb`, worker `0.5c-512mb`, Postgres `0.1c-256mb`). Free Postgres expires after 30 days and free web services sleep after 15 minutes (Render docs, checked 2026-10-22), which conflicts with judge access through December 15 and with webhook delivery. Cost must be confirmed by the owner (sponsor credits may apply).
+- D22: Hosted demo mode (`PACT_DEMO_MODE=true`) creates an isolated synthetic tenant per visitor at `/demo`, rate-limited per IP and capped per day, instead of sharing one demo login. Sandbox buyer credentials are given to judges privately, not in source.
+- D23: `tsx` is a runtime dependency, because migrations and the worker run TypeScript directly on the host. In production, `APP_ORIGIN` is required for links and redirects behind the proxy.
 
 ## Open decisions and gates
 

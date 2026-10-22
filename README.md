@@ -4,7 +4,7 @@
 
 Pact is a responsive web application for businesses selling custom goods and project services. It turns customer amendment requests into reviewed revisions, explicit approvals, correct PayPal payments, and current fulfillment instructions.
 
-**Status: product and implementation blueprint. This branch does not contain a runnable Pact application.** All proposed behavior and acceptance criteria below are requirements, not claims of completed functionality or proven demand.
+**Status: early runnable prototype (sandbox only).** One vertical amendment workflow runs end to end locally across both demonstration domains. Several P0 items are still missing; see [Implementation status](#implementation-status). Nothing here is evidence of demand, users or production readiness.
 
 ## The problem
 
@@ -40,15 +40,75 @@ Pact starts as a web app. No extension, native mobile app, CLI product or WhatsA
 
 The remote branch `feat/speclock-mvp` contains earlier SpecLock code. Do not treat its authorization/QC flow as the Pact implementation. [The migration assessment](docs/pact/04-architecture.md#existing-code) identifies reusable candidates and incompatible assumptions. This documentation branch starts from `main` and leaves that implementation intact.
 
-Target stack: TypeScript, React/Next.js, PostgreSQL, private attachment storage, one model provider, PayPal sandbox and Render hosting. Exact dependency versions are selected and locked during implementation. APIMatic/Postman may help development; other sponsors are outside the committed scope.
+Stack in use: TypeScript, Next.js 16.4.2 / React 19.3, PostgreSQL via `pg`, zod 4, Gemini via `@google/genai`, PayPal REST (sandbox). Versions are pinned in `package.json` and locked in `package-lock.json`. Private attachment storage and Render hosting are still planned. APIMatic/Postman may help development; other sponsors are outside the committed scope.
 
-## Repository checks available now
+## Run locally
+
+Requirements: Node.js 20.9+ (tested with 26.12), PostgreSQL 15+ (tested with 15.15), PayPal **sandbox** REST app credentials. A Gemini API key is optional; without one the deterministic baseline extractor is used.
 
 ```sh
-python3 scripts/check_pact_docs.py
+npm install
+createdb pact_dev && createdb pact_test
+cp .env.example .env.local        # fill in DATABASE_URL, PAYPAL_CLIENT_ID/SECRET, optional GEMINI_API_KEY
+npm run db:migrate
+npm run db:seed                   # synthetic tenant, users and two published demo jobs; prints customer review links
+npm run dev                       # http://localhost:3000 (set APP_ORIGIN if you use another port)
+npm run worker                    # optional: outbox analysis, payment reconciliation, webhook retries
 ```
 
-This checks blueprint links and synthetic fixture invariants. It is not an application test. Application install/run commands must be added when the implementation exists.
+Sign in as `owner@northwind.example.test` (or `team@northwind.example.test` for the fulfillment view) with the seed password (`pact-demo-only` unless `SEED_PASSWORD` is set). Open a printed review link in a separate (mobile-sized) browser session to act as the customer. Paying requires a PayPal sandbox buyer account.
+
+Checks:
+
+```sh
+npm run typecheck
+npm run lint
+npm test                          # unit + PostgreSQL integration tests (uses TEST_DATABASE_URL, default postgres://localhost:5432/pact_test)
+npm run build
+npm run check:docs                # blueprint links and fixture invariants
+npm run eval:ai                   # synthetic AI cases: baseline, plus the model if configured
+npm run smoke:paypal              # real sandbox order creation; `-- <orderId>` captures after buyer approval
+```
+
+Integration tests inject failures through an in-memory PayPal **test double** (`test/fake-paypal.ts`). Those tests prove Pact's own recovery logic, not PayPal behavior.
+
+## Deploy (Render)
+
+`render.yaml` is a Render Blueprint: one web service (migrations run as the pre-deploy step), an optional worker, and PostgreSQL. All of them are small **paid** plans. Free Postgres expires after 30 days and free web services sleep after 15 minutes, which would break judging and webhooks.
+
+1. Merge to `main`, which the Blueprint deploys. In Render, choose **New → Blueprint** and pick this repository.
+2. Enter the prompted secrets: `APP_ORIGIN` (the service URL, e.g. `https://pact-web.onrender.com`), PayPal sandbox client ID and secret, `PAYPAL_WEBHOOK_ID`, and `GEMINI_API_KEY`.
+3. In the PayPal sandbox app, add the webhook `https://<service host>/api/paypal/webhook` for `CHECKOUT.ORDER.APPROVED` and `PAYMENT.CAPTURE.*`. Put its ID in `PAYPAL_WEBHOOK_ID` on the web service and redeploy.
+4. Open `https://<service host>/demo`. With `PACT_DEMO_MODE=true`, each visitor gets an isolated synthetic workspace (rate-limited, capped by `PACT_DEMO_DAILY_LIMIT`) and is signed in as its owner.
+
+Give judges sandbox buyer credentials privately in the submission's testing instructions. Never put them in this repository.
+
+## Implementation status
+
+Last verified 2026-10-22 on branch `feat/pact-app`.
+
+Working locally:
+
+- Merchant login with hashed sessions and tenant-scoped queries; owner and fulfillment roles. Customer review links are stored hashed and swapped for a short job-scoped session.
+- Apparel and website templates on one engine. Merchant rate cards and artwork catalogs. Original agreement entered manually, then published.
+- Message intake (pasted or portal) → outbox analysis → validated proposal with citations. Gemini (`gemini-3.7-flash`) with fallback to a deterministic baseline. Literal-quote, field, catalog and base-revision checks. Questions, approval-like wording and injected instructions cannot change the agreement.
+- Merchant review: resolve missing fields, set prices, create a draft, publish an immutable revision. Database triggers enforce revision immutability and an append-only audit log.
+- Customer portal: see the diff and money effect, then approve or decline that exact revision and content hash. Stale proposals and replaced links are refused.
+- Separate buyer-approved PayPal Orders v2 CAPTURE checkouts for the deposit, additional deposit and balance. Durable operations with stable `PayPal-Request-Id`s. Lost responses become UNKNOWN and are reconciled. Payments for a replaced revision become REVIEW_REQUIRED and need an explicit credit or refund decision. Merchant-reviewed partial refunds use reserved capacity. Webhooks are verified, deduplicated and re-read from the provider.
+- Readiness blockers, merchant release, started-work exceptions, manual holds, printable job sheet and history timeline.
+
+Verified against the real PayPal sandbox on 2026-10-22, driven through the app UI with a sandbox buyer account (synthetic apparel job):
+
+- Deposit: $300.00 order created, approved by the buyer, captured server-side and re-read independently (`COMPLETED`).
+- Amendment: substitution proposed by `gemini-3.7-flash`, sizes resolved by the merchant, R2 published and approved. Additional deposit of $100.00 captured and re-read (`COMPLETED`). Work released.
+- Partial refund: $10.00 refund `COMPLETED`, re-read independently. The capture is now `PARTIALLY_REFUNDED` at PayPal.
+- An unapproved order returning to the app was refused (`PAYER_ACTION_REQUIRED`) and recorded no funding.
+
+- Webhooks: real sandbox deliveries through a temporary tunnel, for `CHECKOUT.ORDER.APPROVED`, `PAYMENT.CAPTURE.COMPLETED` and `PAYMENT.CAPTURE.REFUNDED`. Each passed PayPal's signature verification, was stored once by event ID and was processed after re-reading the resource. The approval event and the browser return raced on the same order and produced exactly one capture.
+
+Webhook setup: add `https://<public-url>/api/paypal/webhook` to the sandbox app, subscribe it to `CHECKOUT.ORDER.APPROVED` and `PAYMENT.CAPTURE.*`, and put its ID in `PAYPAL_WEBHOOK_ID`. Unsigned or unverifiable events are rejected with 400. A hosted deployment needs a stable URL; quick tunnels change on restart.
+
+Not implemented yet: attachment upload and storage (artwork is chosen from catalog IDs), creating the original agreement from extraction, email notifications, a verified hosted deployment (the Render Blueprint exists but has not been deployed), backup/restore test, held-out AI evaluation set (only 12 development cases exist), real-user replay. See [decisions](docs/pact/11-evidence-decisions.md) D11–D20 for deviations from the blueprint.
 
 ## Hackathon
 
