@@ -29,6 +29,6 @@ Provide a hosted sandbox demo with constrained synthetic tenants, clear sandbox 
 
 ## Delivery status
 
-Completed in this branch: product blueprint, domain/payment/AI specifications, evaluation fixtures, documentation checks, MIT license and contributor/security guidance.
+Completed: product blueprint, specifications, fixtures and checks. Local Pact runtime (see README implementation status), with 70 automated tests (unit plus PostgreSQL integration, payment failures injected through a test double). Sandbox order creation verified. A first synthetic AI evaluation is in `reports/ai-eval-latest.json` (12 development cases: baseline 12/12, a set it was written against; model 8/12, with all 4 misses being provider 503 or timeout errors and 8/8 correct on the cases it answered).
 
-Not completed: Pact runtime, live AI evaluations, sandbox payment spike, deployment, user interviews, production permissions, legal clearance or hackathon submission. Implementation claims must be updated only with actual test evidence.
+Not completed: sandbox buyer approval plus capture through the app, refunds and webhook delivery; held-out AI evaluation; deployment; backup/restore test; user interviews; production permissions; legal clearance; hackathon submission. Update implementation claims only with actual test evidence.

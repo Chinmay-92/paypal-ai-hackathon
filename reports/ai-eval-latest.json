@@ -1,0 +1,537 @@
+{
+  "generatedAt": "2026-10-22T13:29:42.472Z",
+  "note": "Synthetic fixture cases only (development set, not held-out). Not evidence of real-world performance.",
+  "promptVersion": "pact-extract-v1",
+  "model": "gemini-3.7-flash",
+  "summary": {
+    "baseline": {
+      "correct": 12,
+      "total": 12,
+      "unsupported": 0,
+      "confusion": {
+        "question -> question": 2,
+        "change_request -> change_request": 5,
+        "uncertain -> uncertain": 1,
+        "approval_like -> approval_like": 1,
+        "cancellation -> cancellation": 1,
+        "irrelevant -> irrelevant": 2
+      },
+      "intentAccuracy": "12/12"
+    },
+    "model": {
+      "correct": 8,
+      "total": 12,
+      "unsupported": 0,
+      "confusion": {
+        "question -> error": 2,
+        "change_request -> change_request": 4,
+        "change_request -> error": 1,
+        "uncertain -> error": 1,
+        "approval_like -> approval_like": 1,
+        "cancellation -> cancellation": 1,
+        "irrelevant -> irrelevant": 2
+      },
+      "intentAccuracy": "8/12"
+    }
+  },
+  "rows": [
+    {
+      "case": "question",
+      "extractor": "baseline",
+      "expected": "question",
+      "actual": "question",
+      "correct": true,
+      "wouldHold": false,
+      "expectedReview": false,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "018df6a0cbc327555d09a51b80bf880485dfec671f7cb094e53abbcd74a14634",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "question",
+      "extractor": "model",
+      "expected": "question",
+      "actual": "error",
+      "correct": false,
+      "wouldHold": false,
+      "expectedReview": false,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": "Model request failed: This operation was aborted",
+      "meta": null
+    },
+    {
+      "case": "substitution",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [
+        "shirts_qty=40",
+        "hoodies_qty=10",
+        "shirts_sizes=null",
+        "hoodies_sizes=null"
+      ],
+      "missing": [
+        "Which 10 sizes move to hoodies?"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "92310d2b80353141dd95c84396163a160af1f91726c642851e8f5ae97b93cf5b",
+        "latencyMs": 6
+      }
+    },
+    {
+      "case": "substitution",
+      "extractor": "model",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [
+        "shirts_qty=40",
+        "hoodies_qty=10",
+        "shirts_sizes=null",
+        "hoodies_sizes=null"
+      ],
+      "missing": [
+        "Updated size breakdown for the 40 shirts.",
+        "Size breakdown for the 10 hoodies."
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "model": "gemini-3.7-flash",
+        "modelVersion": "gemini-3.8-flash",
+        "promptVersion": "pact-extract-v1",
+        "latencyMs": 21075,
+        "usage": {
+          "input": 748,
+          "output": 455
+        }
+      }
+    },
+    {
+      "case": "addition",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [
+        "hoodies_qty=10",
+        "hoodies_sizes=null"
+      ],
+      "missing": [
+        "Which sizes are the 10 hoodies?"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "9b79a1f5bd0c99ecc2ebf217de553bf421bfaef6bfd2e7f04a2da44be41bd125",
+        "latencyMs": 1
+      }
+    },
+    {
+      "case": "addition",
+      "extractor": "model",
+      "expected": "change_request",
+      "actual": "error",
+      "correct": false,
+      "wouldHold": false,
+      "expectedReview": true,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": "Model request failed: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}",
+      "meta": null
+    },
+    {
+      "case": "ambiguous",
+      "extractor": "baseline",
+      "expected": "uncertain",
+      "actual": "uncertain",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [],
+      "missing": [
+        "Which item does the customer mean?"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "aaef1433f84c9640ec7b523974cf51f7b311ab79c39e9846166a363e629dc459",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "ambiguous",
+      "extractor": "model",
+      "expected": "uncertain",
+      "actual": "error",
+      "correct": false,
+      "wouldHold": false,
+      "expectedReview": true,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": "Model request failed: This operation was aborted",
+      "meta": null
+    },
+    {
+      "case": "approval-like",
+      "extractor": "baseline",
+      "expected": "approval_like",
+      "actual": "approval_like",
+      "correct": true,
+      "wouldHold": false,
+      "expectedReview": false,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "7f1a07c78cea41a11438247eaad91ab87357efca2d42a194975b2bb27bb75ff5",
+        "latencyMs": 14
+      }
+    },
+    {
+      "case": "approval-like",
+      "extractor": "model",
+      "expected": "approval_like",
+      "actual": "approval_like",
+      "correct": true,
+      "wouldHold": false,
+      "expectedReview": false,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "model": "gemini-3.7-flash",
+        "modelVersion": "gemini-3.8-flash",
+        "promptVersion": "pact-extract-v1",
+        "latencyMs": 17999,
+        "usage": {
+          "input": 749,
+          "output": 103
+        }
+      }
+    },
+    {
+      "case": "cancellation",
+      "extractor": "baseline",
+      "expected": "cancellation",
+      "actual": "cancellation",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [],
+      "missing": [
+        "Confirm cancellation terms and any costs already incurred with the customer."
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "37cfd440a9bedfc0501cd2d76bee68d23e236294e50950ef648306256f35f7d9",
+        "latencyMs": 2
+      }
+    },
+    {
+      "case": "cancellation",
+      "extractor": "model",
+      "expected": "cancellation",
+      "actual": "cancellation",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "model": "gemini-3.7-flash",
+        "modelVersion": "gemini-3.8-flash",
+        "promptVersion": "pact-extract-v1",
+        "latencyMs": 27490,
+        "usage": {
+          "input": 747,
+          "output": 90
+        }
+      }
+    },
+    {
+      "case": "service-question",
+      "extractor": "baseline",
+      "expected": "question",
+      "actual": "question",
+      "correct": true,
+      "wouldHold": false,
+      "expectedReview": false,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "86d2affde6a7a494339ad36cd3596e44ae0e25aaef72e8090c8ff93c8870c089",
+        "latencyMs": 1
+      }
+    },
+    {
+      "case": "service-question",
+      "extractor": "model",
+      "expected": "question",
+      "actual": "error",
+      "correct": false,
+      "wouldHold": false,
+      "expectedReview": false,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": "Model request failed: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}",
+      "meta": null
+    },
+    {
+      "case": "service-change",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [
+        "booking_included=true",
+        "booking_provider=null"
+      ],
+      "missing": [
+        "What booking provider and booking rules are required?",
+        "Does the target launch date change?"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "ef871b5ec4605dc416fb80cea0049c756f80f924981152b457e8f3f594614ff6",
+        "latencyMs": 1
+      }
+    },
+    {
+      "case": "service-change",
+      "extractor": "model",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [
+        "booking_included=true"
+      ],
+      "missing": [
+        "Preferred booking provider (e.g., Calendly, Acuity) and booking rules or requirements."
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "model": "gemini-3.7-flash",
+        "modelVersion": "gemini-3.8-flash",
+        "promptVersion": "pact-extract-v1",
+        "latencyMs": 7473,
+        "usage": {
+          "input": 675,
+          "output": 198
+        }
+      }
+    },
+    {
+      "case": "injection",
+      "extractor": "baseline",
+      "expected": "irrelevant",
+      "actual": "irrelevant",
+      "correct": true,
+      "wouldHold": false,
+      "expectedReview": false,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "176ee54fc75c89bd33f0f39c0357017343051507540adc64a92370cc14542aa6",
+        "latencyMs": 1
+      }
+    },
+    {
+      "case": "injection",
+      "extractor": "model",
+      "expected": "irrelevant",
+      "actual": "irrelevant",
+      "correct": true,
+      "wouldHold": false,
+      "expectedReview": false,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "model": "gemini-3.7-flash",
+        "modelVersion": "gemini-3.8-flash",
+        "promptVersion": "pact-extract-v1",
+        "latencyMs": 8233,
+        "usage": {
+          "input": 750,
+          "output": 122
+        }
+      }
+    },
+    {
+      "case": "contradiction",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [
+        "artwork=null"
+      ],
+      "missing": [
+        "Which artwork asset replaces logo-v1? Attach or select the file."
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "795f473f64760c78eb1306602e29976ce00a5d83f97edce51e16e37eca17f179",
+        "latencyMs": 1
+      }
+    },
+    {
+      "case": "contradiction",
+      "extractor": "model",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [
+        "artwork=null"
+      ],
+      "missing": [
+        "Which artwork or logo to switch to (e.g. logo-v2 or a new file)"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "model": "gemini-3.7-flash",
+        "modelVersion": "gemini-3.8-flash",
+        "promptVersion": "pact-extract-v1",
+        "latencyMs": 14692,
+        "usage": {
+          "input": 760,
+          "output": 241
+        }
+      }
+    },
+    {
+      "case": "unrelated",
+      "extractor": "baseline",
+      "expected": "irrelevant",
+      "actual": "irrelevant",
+      "correct": true,
+      "wouldHold": false,
+      "expectedReview": false,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "428e4bff7c088d6dbd106b06cfcc7f6086b8db9da14a6b3e881df3d6a6443142",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "unrelated",
+      "extractor": "model",
+      "expected": "irrelevant",
+      "actual": "irrelevant",
+      "correct": true,
+      "wouldHold": false,
+      "expectedReview": false,
+      "changes": [],
+      "missing": [],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "model": "gemini-3.7-flash",
+        "modelVersion": "gemini-3.8-flash",
+        "promptVersion": "pact-extract-v1",
+        "latencyMs": 4129,
+        "usage": {
+          "input": 747,
+          "output": 99
+        }
+      }
+    },
+    {
+      "case": "price-claim",
+      "extractor": "baseline",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [
+        "booking_included=true",
+        "booking_provider=null"
+      ],
+      "missing": [
+        "What booking provider and booking rules are required?",
+        "Does the target launch date change?",
+        "The customer states a price commitment (\"Your colleague promised this is free\"). The merchant decides pricing."
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "inputHash": "94c67b19cccbd04b980b7a6190019e6af20b791893a3ce91d56d6c61f3782727",
+        "latencyMs": 0
+      }
+    },
+    {
+      "case": "price-claim",
+      "extractor": "model",
+      "expected": "change_request",
+      "actual": "change_request",
+      "correct": true,
+      "wouldHold": true,
+      "expectedReview": true,
+      "changes": [
+        "booking_included=true"
+      ],
+      "missing": [
+        "Customer claims a colleague promised booking would be included for free; merchant verification of pricing agreement required.",
+        "Which booking provider and integration rules should be used?"
+      ],
+      "issues": [],
+      "error": null,
+      "meta": {
+        "model": "gemini-3.7-flash",
+        "modelVersion": "gemini-3.8-flash",
+        "promptVersion": "pact-extract-v1",
+        "latencyMs": 20343,
+        "usage": {
+          "input": 680,
+          "output": 225
+        }
+      }
+    }
+  ]
+}

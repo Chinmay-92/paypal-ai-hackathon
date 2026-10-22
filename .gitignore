@@ -10,3 +10,9 @@ coverage/
 *.log
 .DS_Store
 __pycache__/
+
+# Local tooling output
+.playwright-mcp/
+next-env.d.ts
+*.tsbuildinfo
+reports/*.local.json
