@@ -63,6 +63,11 @@ export function baselineOriginal(input: ExtractionInput): Omit<Proposal, "propos
     if (ss) add("shirts_sizes", ss.value, ss.span);
     const hs = sizesNear(text, /hoodies/);
     if (hs) add("hoodies_sizes", hs.value, hs.span);
+    // Zero of a garment implies an empty size breakdown, cited to the same words.
+    for (const [qty, sizes] of [["shirts_qty", "shirts_sizes"], ["hoodies_qty", "hoodies_sizes"]] as const) {
+      const c = changes.find((x) => x.field === qty);
+      if (c && c.proposedValue === 0) add(sizes, {}, c.quotedSpan);
+    }
     const color = /\b(black|white|navy|grey|gray|red|blue|green|heather grey)\b(?=[^.]{0,30}\b(?:shirts?|tees|garments?|hoodies)\b)/i.exec(text);
     if (color) add("garment_color", color[1][0].toUpperCase() + color[1].slice(1).toLowerCase(), color[0]);
     for (const a of input.catalog.artwork) {

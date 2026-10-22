@@ -81,6 +81,7 @@ export function NewJobForm({ catalogs }: { catalogs: Record<Domain, Catalog> }) 
           {error.items.length > 0 && <ul>{error.items.map((i) => <li key={i}>{i}</li>)}</ul>}
         </div>
       )}
+      <h2>1. Job and customer</h2>
       <div className="grid-2">
         <div className="field">
           <label htmlFor="domain">Template</label>
@@ -112,14 +113,15 @@ export function NewJobForm({ catalogs }: { catalogs: Record<Domain, Catalog> }) 
           <input id="customerEmail" name="customerEmail" type="email" required />
         </div>
       </div>
-      <details className="panel" style={{ background: "var(--surface-2)" }} open={extracted !== null}>
-        <summary>Start from a quote or conversation (optional)</summary>
+      <h2 style={{ marginTop: "1.5rem" }}>2. What was agreed</h2>
+      <section className="quote-start" aria-labelledby="quote-h">
+        <h2 id="quote-h">Start from the quote you sent (optional)</h2>
         <p className="small muted">Paste the agreed quote or thread. Pact proposes the terms with quotes from your text; review every field below before saving. Prices always come from your rate card.</p>
         <div className="field">
           <label htmlFor="quote">Pasted text</label>
           <textarea id="quote" value={quote} onChange={(e) => setQuote(e.target.value)} maxLength={8000} />
         </div>
-        <button type="button" onClick={extract} disabled={extracting || quote.trim().length < 10}>
+        <button type="button" className="primary" onClick={extract} disabled={extracting || quote.trim().length < 10}>
           {extracting ? "Reading…" : "Propose terms from this text"}
         </button>
         {extractError && (
@@ -165,8 +167,8 @@ export function NewJobForm({ catalogs }: { catalogs: Record<Domain, Catalog> }) 
             )}
           </div>
         )}
-      </details>
-      <h2>Scope</h2>
+      </section>
+
       <ScopeEditor
         fields={TEMPLATES[domain].fields}
         scope={scope}
@@ -174,8 +176,9 @@ export function NewJobForm({ catalogs }: { catalogs: Record<Domain, Catalog> }) 
         artwork={catalogs[domain].artwork}
         highlight={extracted?.citations.filter((c) => c.supported).map((c) => c.field) ?? []}
         idPrefix="new"
+        showUnresolved={extracted !== null}
       />
-      <h2>Price</h2>
+      <h2 style={{ marginTop: "1.5rem" }}>3. Price</h2>
       <p className="muted small">Prices come from your rate card and can be changed. Currency: USD.</p>
       <LineItemsEditor items={items} onChange={setItems} idPrefix="new-li" onSuggest={suggest} />
       <div className="grid-2" style={{ marginTop: "1rem" }}>

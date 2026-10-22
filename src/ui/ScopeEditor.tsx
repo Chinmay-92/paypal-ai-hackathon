@@ -10,6 +10,7 @@ export function ScopeEditor({
   artwork,
   highlight = [],
   idPrefix,
+  showUnresolved = true,
 }: {
   fields: readonly FieldDef[];
   scope: Scope;
@@ -17,6 +18,8 @@ export function ScopeEditor({
   artwork: readonly CatalogEntry[];
   highlight?: string[];
   idPrefix: string;
+  /** Hide "Unresolved" flags on a blank form where nothing has been entered yet. */
+  showUnresolved?: boolean;
 }) {
   const set = (path: string, value: ScopeValue) => onChange({ ...scope, [path]: value });
   return (
@@ -25,9 +28,9 @@ export function ScopeEditor({
         const id = `${idPrefix}-${f.path}`;
         const value = scope[f.path] ?? null;
         const changed = highlight.includes(f.path);
-        const unresolved = value === null;
+        const unresolved = value === null && showUnresolved;
         return (
-          <div className="field" key={f.path} style={f.type === "sizes" || f.type === "text" ? { gridColumn: "1 / -1" } : undefined}>
+          <div className="field" key={f.path} style={f.type === "sizes" || f.multiline ? { gridColumn: "1 / -1" } : undefined}>
             <label htmlFor={id}>
               {f.label} {changed && <span className="badge accent">Proposed</span>}{" "}
               {unresolved && <span className="badge warn">Unresolved</span>}
@@ -35,7 +38,12 @@ export function ScopeEditor({
             {f.type === "int" && (
               <input id={id} type="number" min={0} inputMode="numeric" value={value === null ? "" : String(value)} onChange={(e) => set(f.path, e.target.value === "" ? null : Math.max(0, Math.trunc(Number(e.target.value))))} />
             )}
-            {f.type === "text" && <textarea id={id} value={(value as string | null) ?? ""} onChange={(e) => set(f.path, e.target.value === "" ? null : e.target.value)} />}
+            {f.type === "text" &&
+              (f.multiline ? (
+                <textarea id={id} value={(value as string | null) ?? ""} onChange={(e) => set(f.path, e.target.value === "" ? null : e.target.value)} />
+              ) : (
+                <input id={id} value={(value as string | null) ?? ""} onChange={(e) => set(f.path, e.target.value === "" ? null : e.target.value)} />
+              ))}
             {f.type === "date" && <input id={id} type="date" value={(value as string | null) ?? ""} onChange={(e) => set(f.path, e.target.value || null)} />}
             {f.type === "bool" && (
               <select id={id} value={value === null ? "" : String(value)} onChange={(e) => set(f.path, e.target.value === "" ? null : e.target.value === "true")}>

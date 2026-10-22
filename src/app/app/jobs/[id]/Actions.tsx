@@ -103,13 +103,14 @@ export function PublishDraft(props: { jobId: string; revisionId: string; version
   );
 }
 
-export function ReissueLink({ jobId }: { jobId: string }) {
+export function ReissueLink({ jobId, label = "Create a new review link", primary = false }: { jobId: string; label?: string; primary?: boolean }) {
   const [url, setUrl] = useState<string | null>(null);
   const [error, setError] = useState<{ message: string; items: string[] } | null>(null);
   return (
     <div className="stack">
       <button
         type="button"
+        className={primary ? "primary" : undefined}
         onClick={async () => {
           try {
             setUrl((await postJson<{ reviewUrl: string }>(`/api/jobs/${jobId}/invitations`)).reviewUrl);
@@ -118,7 +119,7 @@ export function ReissueLink({ jobId }: { jobId: string }) {
           }
         }}
       >
-        Create a new review link
+        {label}
       </button>
       <ErrorBox error={error} />
       {url && <LinkResult url={url} />}

@@ -6,7 +6,7 @@ import { postJson } from "@/ui/api";
 import { FilePicker, type Uploaded } from "@/ui/FilePicker";
 import { money } from "@/ui/format";
 
-export function Decision({ revisionId, contentHash, dueNowMinor }: { revisionId: string; contentHash: string; dueNowMinor: number }) {
+export function Decision({ revisionId, contentHash, dueNowMinor, isChange }: { revisionId: string; contentHash: string; dueNowMinor: number; isChange: boolean }) {
   const router = useRouter();
   const [declining, setDeclining] = useState(false);
   const [reason, setReason] = useState("");
@@ -19,6 +19,8 @@ export function Decision({ revisionId, contentHash, dueNowMinor }: { revisionId:
       await postJson(`/api/reviews/${revisionId}/decision`, { action, contentHash, reason: reason || undefined });
       setStatus({ tone: "ok", text: action === "APPROVE" ? (dueNowMinor > 0 ? `Approved. You can now pay the ${money(dueNowMinor)} deposit.` : "Approved. No payment is due now.") : "Declined. Your earlier agreement stays in place." });
       router.refresh();
+      // The next step replaces this card; bring it into view.
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       setStatus({ tone: "bad", text: (err as Error).message });
     } finally {
@@ -31,7 +33,7 @@ export function Decision({ revisionId, contentHash, dueNowMinor }: { revisionId:
       {!declining ? (
         <>
           <button className="primary" type="button" disabled={busy} onClick={() => send("APPROVE")}>
-            Approve this revision
+            {isChange ? "Approve the changes" : "Approve this agreement"}
           </button>
           <p className="small muted" style={{ margin: 0 }}>
             Approving does not charge you. Payment is a separate step.
@@ -51,7 +53,7 @@ export function Decision({ revisionId, contentHash, dueNowMinor }: { revisionId:
           <textarea id="decline-reason" value={reason} onChange={(e) => setReason(e.target.value)} maxLength={1000} />
           <div className="cta" style={{ marginTop: "0.5rem" }}>
             <button className="danger" type="submit" disabled={busy}>
-              Decline this revision
+              {isChange ? "Decline the changes" : "Decline this agreement"}
             </button>
             <button type="button" onClick={() => setDeclining(false)}>
               Back

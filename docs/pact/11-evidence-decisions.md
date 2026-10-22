@@ -49,6 +49,7 @@ Research accessed October 19–20, 2026. Evidence is not an endorsement of vendo
 - D25: Creating the original agreement from a pasted quote is proposal-only: the endpoint stores nothing, and the merchant reviews cited values in the new-job form. This replaces the gap in D20.
 - D26: When the primary model returns 429, 5xx or a timeout, the extractor retries once on `GEMINI_FALLBACK_MODEL` (default `gemini-3.5-flash`), then falls back to the deterministic baseline. Every proposal records the model actually used.
 - D27: The AI evaluation set has 44 synthetic cases: 12 development cases (which informed the baseline and prompt) and 32 held-out cases written after both were frozen. Held-out results are reported, never asserted in tests or used for tuning.
+- D28: Hackathon track: **Business Solutions**. Pact is a tool that helps merchants and freelancers keep changes, approvals, payments and work instructions aligned. Not *AI Agents or Automation*: that track asks for agents that transact on a user's behalf, which conflicts with the rule that AI cannot authorize charges. Every PayPal payment in Pact is approved by the buyer.
 
 ## Open decisions and gates
 

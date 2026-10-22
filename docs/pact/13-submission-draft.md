@@ -2,6 +2,10 @@
 
 Working draft for the Devpost entry. Every claim must match the build and evidence at submission time. Re-check [demo and submission rules](10-demo-submission.md) and update anything marked TODO. Submitting is a separate, explicit action by the entrant.
 
+## Track
+
+Business Solutions (decision D28).
+
 ## Tagline
 
 Pact — Changes agreed. Work aligned.

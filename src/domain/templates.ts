@@ -17,6 +17,8 @@ export type FieldDef = {
   /** For sizes fields: the quantity field the breakdown must add up to. */
   quantityField?: string;
   help?: string;
+  /** Text fields that hold sentences rather than a short value. */
+  multiline?: boolean;
 };
 
 export type Sizes = Record<string, number>;
@@ -119,8 +121,8 @@ const website: Template = {
     { path: "booking_included", label: "Appointment booking included", type: "bool" },
     { path: "booking_provider", label: "Booking provider and rules", type: "text" },
     { path: "revision_rounds", label: "Revision rounds", type: "int" },
-    { path: "exclusions", label: "Exclusions", type: "text" },
-    { path: "acceptance", label: "Acceptance conditions", type: "text" },
+    { path: "exclusions", label: "Exclusions", type: "text", multiline: true },
+    { path: "acceptance", label: "Acceptance conditions", type: "text", multiline: true },
     { path: "target_date", label: "Target launch date", type: "date" },
   ],
   defaultRateCard: [

@@ -12,9 +12,9 @@ export default async function HistoryPage(props: PageProps<"/app/jobs/[id]/histo
   const tz = v.job.timezone;
   return (
     <>
-      <p>
-        <Link href={`/app/jobs/${id}`}>← {v.job.title}</Link>
-      </p>
+      <Link className="back" href={`/app/jobs/${id}`}>
+        ← {v.job.title}
+      </Link>
       <h1>History</h1>
       <div className="panel">
         <h2>Revisions</h2>
