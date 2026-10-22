@@ -44,6 +44,10 @@ The remote branch `feat/speclock-mvp` contains earlier SpecLock code. Do not tre
 
 Stack in use: TypeScript, Next.js 16.4.2 / React 19.3, PostgreSQL via `pg`, zod 4, Gemini via `@google/genai`, PayPal REST (sandbox). Versions are pinned in `package.json` and locked in `package-lock.json`. Private attachment storage and Render hosting are still planned. APIMatic/Postman may help development; other sponsors are outside the committed scope.
 
+## Hosted demo
+
+https://pact-web-h9pp.onrender.com/demo creates a private synthetic workspace. It uses the PayPal sandbox only. It runs on Render's free tier, so the first request after 15 idle minutes can take about a minute.
+
 ## Run locally
 
 Requirements: Node.js 20.9+ (tested with 26.12), PostgreSQL 15+ (tested with 15.15), PayPal **sandbox** REST app credentials. A Gemini API key is optional; without one the deterministic baseline extractor is used.
@@ -112,7 +116,9 @@ Verified against the real PayPal sandbox on 2026-10-22, driven through the app U
 
 Webhook setup: add `https://<public-url>/api/paypal/webhook` to the sandbox app, subscribe it to `CHECKOUT.ORDER.APPROVED` and `PAYMENT.CAPTURE.*`, and put its ID in `PAYPAL_WEBHOOK_ID`. Unsigned or unverifiable events are rejected with 400. A hosted deployment needs a stable URL; quick tunnels change on restart.
 
-Not implemented yet: email notifications, separate object storage (attachments live in PostgreSQL for now), a verified hosted deployment (the Render Blueprint exists but has not been deployed), backup/restore test, real-user replay. The AI evaluation has 44 synthetic cases (12 dev, 32 held-out); see `reports/ai-eval-latest.json`. See [decisions](docs/pact/11-evidence-decisions.md) D11–D20 for deviations from the blueprint.
+Hosted on Render (2026-10-22): health OK; demo workspace created; customer approval; the PayPal sandbox order is created and redirects to PayPal checkout. Not yet verified on the hosted site: buyer capture and webhooks, which need the owner's sandbox buyer and a webhook ID.
+
+Not implemented yet: email notifications, separate object storage (attachments live in PostgreSQL for now), backup/restore test, real-user replay. The AI evaluation has 44 synthetic cases (12 dev, 32 held-out); see `reports/ai-eval-latest.json`. See [decisions](docs/pact/11-evidence-decisions.md) D11–D20 for deviations from the blueprint.
 
 ## Hackathon
 
