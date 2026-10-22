@@ -16,14 +16,20 @@ export async function login(email: string, password: string): Promise<{ token: s
   );
   const ok = await verifyPassword(password, user?.password_hash ?? DUMMY_HASH);
   if (!user || !ok) throw new UnauthenticatedError("Email or password is incorrect");
+  const actor: MerchantActor = { kind: "merchant", tenantId: user.tenant_id, userId: user.id, role: user.role, name: user.name };
+  return { token: await createMerchantSession(actor), actor };
+}
+
+/** Issues a session for an already-authenticated merchant; only the token hash is stored. */
+export async function createMerchantSession(actor: MerchantActor): Promise<string> {
   const token = newToken();
   await pool().query("INSERT INTO merchant_sessions (token_hash, user_id, tenant_id, expires_at) VALUES ($1, $2, $3, $4)", [
     token.hash,
-    user.id,
-    user.tenant_id,
+    actor.userId,
+    actor.tenantId,
     new Date(Date.now() + MERCHANT_SESSION_TTL_MS),
   ]);
-  return { token: token.raw, actor: { kind: "merchant", tenantId: user.tenant_id, userId: user.id, role: user.role, name: user.name } };
+  return token.raw;
 }
 
 export async function merchantFromSession(rawToken: string | undefined): Promise<MerchantActor> {

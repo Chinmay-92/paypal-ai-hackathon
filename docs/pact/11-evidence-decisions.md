@@ -42,6 +42,9 @@ Research accessed October 19–20, 2026. Evidence is not an endorsement of vendo
 - D18: An unexpected error during a provider call is recorded as UNKNOWN, never FAILED. Only a definitive 4xx rejection retires an order.
 - D19: Attachments are not implemented yet. Artwork changes reference merchant catalog IDs, and a message such as "use the attached logo" proposes an unresolved artwork value. This is a P0 gap.
 - D20: The original agreement is entered manually. Creating it from a reviewed extraction is not implemented yet (P0 gap).
+- D21: Render Blueprint (`render.yaml`) on small paid plans (web `0.5c-512mb`, worker `0.5c-512mb`, Postgres `0.1c-256mb`). Free Postgres expires after 30 days and free web services sleep after 15 minutes (Render docs, checked 2026-10-22), which conflicts with judge access through December 15 and with webhook delivery. Cost must be confirmed by the owner (sponsor credits may apply).
+- D22: Hosted demo mode (`PACT_DEMO_MODE=true`) creates an isolated synthetic tenant per visitor at `/demo`, rate-limited per IP and capped per day, instead of sharing one demo login. Sandbox buyer credentials are given to judges privately, not in source.
+- D23: `tsx` is a runtime dependency, because migrations and the worker run TypeScript directly on the host. In production, `APP_ORIGIN` is required for links and redirects behind the proxy.
 
 ## Open decisions and gates
 

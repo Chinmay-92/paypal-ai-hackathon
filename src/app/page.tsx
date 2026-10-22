@@ -1,6 +1,10 @@
 import Link from "next/link";
+import { connection } from "next/server";
+import { demoModeEnabled } from "@/server/demo";
 
-export default function Home() {
+export default async function Home() {
+  await connection();
+  const demo = demoModeEnabled();
   return (
     <>
       <header className="topbar">
@@ -29,8 +33,13 @@ export default function Home() {
             Demonstration data is synthetic. All payments use the PayPal sandbox; no real money moves. This is a hackathon prototype, not a production service.
           </p>
           <div className="row">
-            <Link className="button primary" href="/login">
-              Open the merchant workspace
+            {demo && (
+              <Link className="button primary" href="/demo">
+                Try the demo
+              </Link>
+            )}
+            <Link className={demo ? "button" : "button primary"} href="/login">
+              Sign in
             </Link>
           </div>
         </div>

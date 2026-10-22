@@ -72,6 +72,17 @@ npm run smoke:paypal              # real sandbox order creation; `-- <orderId>` 
 
 Integration tests inject failures through an in-memory PayPal **test double** (`test/fake-paypal.ts`). Those tests prove Pact's own recovery logic, not PayPal behavior.
 
+## Deploy (Render)
+
+`render.yaml` is a Render Blueprint: one web service (migrations run as the pre-deploy step), an optional worker, and PostgreSQL. All of them are small **paid** plans. Free Postgres expires after 30 days and free web services sleep after 15 minutes, which would break judging and webhooks.
+
+1. Merge to `main`, which the Blueprint deploys. In Render, choose **New → Blueprint** and pick this repository.
+2. Enter the prompted secrets: `APP_ORIGIN` (the service URL, e.g. `https://pact-web.onrender.com`), PayPal sandbox client ID and secret, `PAYPAL_WEBHOOK_ID`, and `GEMINI_API_KEY`.
+3. In the PayPal sandbox app, add the webhook `https://<service host>/api/paypal/webhook` for `CHECKOUT.ORDER.APPROVED` and `PAYMENT.CAPTURE.*`. Put its ID in `PAYPAL_WEBHOOK_ID` on the web service and redeploy.
+4. Open `https://<service host>/demo`. With `PACT_DEMO_MODE=true`, each visitor gets an isolated synthetic workspace (rate-limited, capped by `PACT_DEMO_DAILY_LIMIT`) and is signed in as its owner.
+
+Give judges sandbox buyer credentials privately in the submission's testing instructions. Never put them in this repository.
+
 ## Implementation status
 
 Last verified 2026-10-22 on branch `feat/pact-app`.
@@ -97,7 +108,7 @@ Verified against the real PayPal sandbox on 2026-10-22, driven through the app U
 
 Webhook setup: add `https://<public-url>/api/paypal/webhook` to the sandbox app, subscribe it to `CHECKOUT.ORDER.APPROVED` and `PAYMENT.CAPTURE.*`, and put its ID in `PAYPAL_WEBHOOK_ID`. Unsigned or unverifiable events are rejected with 400. A hosted deployment needs a stable URL; quick tunnels change on restart.
 
-Not implemented yet: attachment upload and storage (artwork is chosen from catalog IDs), creating the original agreement from extraction, email notifications, deployment (Render), backup/restore test, held-out AI evaluation set (only 12 development cases exist), real-user replay. See [decisions](docs/pact/11-evidence-decisions.md) D11–D20 for deviations from the blueprint.
+Not implemented yet: attachment upload and storage (artwork is chosen from catalog IDs), creating the original agreement from extraction, email notifications, a verified hosted deployment (the Render Blueprint exists but has not been deployed), backup/restore test, held-out AI evaluation set (only 12 development cases exist), real-user replay. See [decisions](docs/pact/11-evidence-decisions.md) D11–D20 for deviations from the blueprint.
 
 ## Hackathon
 

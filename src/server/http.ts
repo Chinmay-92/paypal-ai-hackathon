@@ -20,8 +20,11 @@ export function cookieOptions(maxAgeSeconds: number) {
   };
 }
 
+/** Public origin for links and redirects. Behind a proxy (Render) the request URL is internal, so production requires APP_ORIGIN. */
 export function appOrigin(req: NextRequest): string {
-  return process.env.APP_ORIGIN ?? req.nextUrl.origin;
+  if (process.env.APP_ORIGIN) return process.env.APP_ORIGIN;
+  if (process.env.NODE_ENV === "production") throw new AppError(503, "UNAVAILABLE", "APP_ORIGIN is not configured");
+  return req.nextUrl.origin;
 }
 
 /** CSRF defence for cookie-authenticated writes: the browser's Origin must be ours. */

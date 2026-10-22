@@ -1,9 +1,11 @@
+import { randomBytes } from "node:crypto";
 import type { MerchantActor } from "@/application/actors";
+import { AppError } from "@/application/errors";
 import { createJob } from "@/application/jobs";
 import { publishRevision } from "@/application/revisions";
 import { hashPassword } from "@/application/tokens";
 import { TEMPLATES, template } from "@/domain/templates";
-import { one, withTx } from "@/persistence/db";
+import { one, pool, withTx } from "@/persistence/db";
 import { newId, seedCatalog } from "@/persistence/repo";
 
 // Synthetic demonstration workspace. Every name, email and amount here is
@@ -83,4 +85,39 @@ export async function createDemoJobs(owner: MerchantActor, origin: string, suffi
     out.push({ jobId: job.id, title, reviewUrl: `${origin}/review/${invitationToken}` });
   }
   return out;
+}
+
+export const DEMO_WORKSPACE_PREFIX = "Demo workspace";
+
+export function demoModeEnabled(env: Record<string, string | undefined> = process.env): boolean {
+  return env.PACT_DEMO_MODE === "true";
+}
+
+/**
+ * Hosted judge demo: a fresh, isolated synthetic tenant per visitor, with its
+ * own users and demo jobs. Capped per day so the public demo cannot be used to
+ * fill the database.
+ */
+export async function createDemoWorkspace(origin: string) {
+  const limit = Number(process.env.PACT_DEMO_DAILY_LIMIT ?? 200);
+  const recent = await one<{ n: number }>(
+    pool(),
+    "SELECT count(*)::int AS n FROM tenants WHERE synthetic AND name LIKE $1 AND created_at > now() - interval '24 hours'",
+    [`${DEMO_WORKSPACE_PREFIX} %`],
+  );
+  if ((recent?.n ?? 0) >= limit) throw new AppError(429, "RATE_LIMITED", "The demo has reached today's limit. Please try again tomorrow.");
+  const short = randomBytes(4).toString("hex");
+  const password = randomBytes(9).toString("base64url");
+  const ownerEmail = `owner-${short}@demo.pact.invalid`;
+  const teamEmail = `team-${short}@demo.pact.invalid`;
+  const { actors } = await ensureTenant(
+    `${DEMO_WORKSPACE_PREFIX} ${short} (synthetic)`,
+    [
+      { email: ownerEmail, name: "Demo owner (synthetic)", role: "owner" },
+      { email: teamEmail, name: "Demo team (synthetic)", role: "fulfillment" },
+    ],
+    password,
+  );
+  const jobs = await createDemoJobs(actors[0], origin);
+  return { owner: actors[0], ownerEmail, teamEmail, password, jobs };
 }

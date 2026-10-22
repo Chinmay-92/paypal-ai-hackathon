@@ -1,0 +1,82 @@
+# Render Blueprint for the Pact hosted sandbox demo.
+# Create it in Render: New > Blueprint > select this repository.
+# Plans are small paid tiers: free Postgres expires after 30 days and free web
+# services sleep after 15 minutes, which would break judging (ends Dec 15) and
+# PayPal webhooks. Secrets are prompted once at creation (sync: false); never
+# commit them. PayPal is sandbox-only: Pact refuses any other PayPal base URL.
+
+databases:
+  - name: pact-db
+    plan: 0.1c-256mb
+    databaseName: pact
+    user: pact
+    postgresMajorVersion: "17"
+    # Only Render services connect; no public database access.
+    ipAllowList: []
+
+services:
+  - type: web
+    name: pact-web
+    runtime: node
+    plan: 0.5c-512mb
+    branch: main
+    autoDeployTrigger: commit
+    buildCommand: npm ci && npm run build
+    preDeployCommand: npm run db:migrate
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pact-db
+          property: connectionString
+      # Public URL of this service, e.g. https://pact-web.onrender.com (used in review links and PayPal return URLs).
+      - key: APP_ORIGIN
+        sync: false
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      # Webhook ID of https://<APP_ORIGIN host>/api/paypal/webhook in the PayPal sandbox app.
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.7-flash
+      # Lets visitors create isolated synthetic demo workspaces at /demo.
+      - key: PACT_DEMO_MODE
+        value: "true"
+      - key: PACT_DEMO_DAILY_LIMIT
+        value: "200"
+
+  # Outbox analysis, payment reconciliation and webhook retries. Optional for a
+  # demo (webhooks and "Check payment status" also recover payments), but
+  # recommended so UNKNOWN/PENDING payments settle without a click.
+  - type: worker
+    name: pact-worker
+    runtime: node
+    plan: 0.5c-512mb
+    branch: main
+    autoDeployTrigger: commit
+    buildCommand: npm ci
+    startCommand: npm run worker
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pact-db
+          property: connectionString
+      - key: APP_ORIGIN
+        sync: false
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.7-flash
