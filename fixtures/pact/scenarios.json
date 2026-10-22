@@ -1,0 +1,55 @@
+[
+  {
+    "id": "apparel",
+    "synthetic": true,
+    "currency": "USD",
+    "original_total_minor": 60000,
+    "revised_total_minor": 80000,
+    "deposit_basis_points": 5000,
+    "prior_paid_minor": 30000,
+    "expected_additional_deposit_minor": 10000,
+    "expected_remaining_balance_minor": 40000,
+    "original_scope": {
+      "shirts": 50,
+      "hoodies": 0,
+      "artwork": "logo-v1"
+    },
+    "message": "Make ten of those hoodies instead. Use the attached logo on everything.",
+    "expected_scope": {
+      "shirts": 40,
+      "hoodies": 10,
+      "artwork": "logo-v2"
+    },
+    "required_clarification": [
+      "Which sizes move to hoodies?"
+    ],
+    "price_authority": "merchant"
+  },
+  {
+    "id": "website",
+    "synthetic": true,
+    "currency": "USD",
+    "original_total_minor": 120000,
+    "revised_total_minor": 180000,
+    "deposit_basis_points": 5000,
+    "prior_paid_minor": 60000,
+    "expected_additional_deposit_minor": 30000,
+    "expected_remaining_balance_minor": 90000,
+    "original_scope": {
+      "pages": 5,
+      "booking_included": false,
+      "revision_rounds": 2
+    },
+    "message": "Please add appointment booking to the website.",
+    "expected_scope": {
+      "pages": 5,
+      "booking_included": true,
+      "revision_rounds": 2
+    },
+    "required_clarification": [
+      "What booking provider and booking rules are required?",
+      "Does the delivery date change?"
+    ],
+    "price_authority": "merchant"
+  }
+]
