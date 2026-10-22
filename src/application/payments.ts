@@ -109,17 +109,20 @@ export async function startCheckout(actor: CustomerActor, obligationId: string, 
   const { op, obligation, job } = reserved;
   if (op.status === "SUCCEEDED" && op.provider_order_id) {
     let order: ProviderOrder | null = null;
+    let gone = false;
     try {
       order = await paymentProvider().getOrder(op.provider_order_id);
-    } catch {
-      // Read failure: the stored approval link is still the right one to offer.
+    } catch (err) {
+      // PayPal no longer has the order (expired or purged): it can never be paid, so open a new one.
+      // Any other read failure keeps offering the stored approval link.
+      gone = err instanceof ProviderRejectedError && err.status === 404;
     }
     if (order && (order.status === "APPROVED" || order.status === "COMPLETED")) return { kind: "capture", operationId: op.id };
-    if (order && order.status === "VOIDED") {
+    if (gone || (order && order.status === "VOIDED")) {
       if (attempt > 0) throw new ServiceUnavailableError("PayPal could not open a checkout. Try again shortly.");
       await withTx(async (tx) => {
         await lockJob(tx, actor.tenantId, actor.jobId);
-        await retireOrder(tx, op, obligation, "ORDER_VOIDED");
+        await retireOrder(tx, op, obligation, gone ? "ORDER_NOT_FOUND" : "ORDER_VOIDED");
       });
       return startCheckout(actor, obligationId, origin, attempt + 1);
     }
