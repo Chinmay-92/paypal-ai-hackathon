@@ -74,7 +74,7 @@ Integration tests inject failures through an in-memory PayPal **test double** (`
 
 ## Deploy (Render)
 
-`render.yaml` is a Render Blueprint: one web service (migrations run as the pre-deploy step), an optional worker, and PostgreSQL. All of them are small **paid** plans. Free Postgres expires after 30 days and free web services sleep after 15 minutes, which would break judging and webhooks.
+`render.yaml` is a Render Blueprint: one web service (migrations run on start) and PostgreSQL, currently on **free** plans. **Upgrade before submission:** free Postgres expires 30 days after creation (before judging ends on December 15), and the free web service sleeps after 15 idle minutes. Render has no free worker, so the worker is omitted; payments still recover through verified webhooks and the "Check payment status" button. To add it back, run `npm run worker` as a Render background worker.
 
 1. Merge to `main`, which the Blueprint deploys. In Render, choose **New → Blueprint** and pick this repository.
 2. Enter the prompted secrets: `APP_ORIGIN` (the service URL, e.g. `https://pact-web.onrender.com`), PayPal sandbox client ID and secret, `PAYPAL_WEBHOOK_ID`, and `GEMINI_API_KEY`.
