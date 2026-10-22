@@ -44,3 +44,17 @@ next-env.d.ts
 /.data/
 !.env.example
 /.playwright-mcp/
+
+# from main
+# Secrets and local runtime data
+.env
+.env.*
+!.env.example
+node_modules/
+.next/
+dist/
+coverage/
+.data/
+*.log
+.DS_Store
+__pycache__/
