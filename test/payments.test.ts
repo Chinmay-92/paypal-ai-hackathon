@@ -118,6 +118,21 @@ describe("uncertain provider outcomes", () => {
     expect(w.paypal.orders.size).toBe(1);
   });
 
+  it("an order PayPal no longer has (expired or purged) is replaced by a new one", async () => {
+    const { c, deposit } = await depositDue();
+    const first = await startCheckout(c, deposit.id, ORIGIN);
+    if (first.kind !== "redirect") throw new Error("expected redirect");
+    w.paypal.orders.delete(await orderFor(first.operationId)); // getOrder now returns 404
+    const second = await startCheckout(c, deposit.id, ORIGIN);
+    if (second.kind !== "redirect") throw new Error("expected redirect");
+    expect(second.operationId).not.toBe(first.operationId);
+    expect(second.approveUrl).not.toBe(first.approveUrl);
+    const ops = await many<{ status: string; last_error: string | null }>(pool(), "SELECT status, last_error FROM payment_operations WHERE obligation_id = $1 ORDER BY created_at", [deposit.id]);
+    expect(ops.map((o) => o.status)).toEqual(["FAILED", "SUCCEEDED"]);
+    expect(ops[0].last_error).toBe("ORDER_NOT_FOUND");
+    expect(w.paypal.captures.size).toBe(0);
+  });
+
   it("a definitive decline lets the customer try again with a new order", async () => {
     const { c, deposit } = await depositDue();
     const checkout = await startCheckout(c, deposit.id, ORIGIN);
