@@ -86,7 +86,14 @@ Working locally:
 - Separate buyer-approved PayPal Orders v2 CAPTURE checkouts for the deposit, additional deposit and balance. Durable operations with stable `PayPal-Request-Id`s. Lost responses become UNKNOWN and are reconciled. Payments for a replaced revision become REVIEW_REQUIRED and need an explicit credit or refund decision. Merchant-reviewed partial refunds use reserved capacity. Webhooks are verified, deduplicated and re-read from the provider.
 - Readiness blockers, merchant release, started-work exceptions, manual holds, printable job sheet and history timeline.
 
-Verified against the real PayPal sandbox: OAuth, order creation (smoke script and the app's checkout redirect to sandbox approval), order retrieval, and a capture refused for an unapproved order (`PAYER_ACTION_REQUIRED`). **Not yet verified in the sandbox:** buyer approval plus capture through the app, refunds, and webhook delivery and signature verification. These need a sandbox buyer account and a public webhook URL.
+Verified against the real PayPal sandbox on 2026-10-22, driven through the app UI with a sandbox buyer account (synthetic apparel job):
+
+- Deposit: $300.00 order created, approved by the buyer, captured server-side and re-read independently (`COMPLETED`).
+- Amendment: substitution proposed by `gemini-3.7-flash`, sizes resolved by the merchant, R2 published and approved. Additional deposit of $100.00 captured and re-read (`COMPLETED`). Work released.
+- Partial refund: $10.00 refund `COMPLETED`, re-read independently. The capture is now `PARTIALLY_REFUNDED` at PayPal.
+- An unapproved order returning to the app was refused (`PAYER_ACTION_REQUIRED`) and recorded no funding.
+
+Not yet verified in the sandbox: webhook delivery and signature verification (needs a public webhook URL and `PAYPAL_WEBHOOK_ID`).
 
 Not implemented yet: attachment upload and storage (artwork is chosen from catalog IDs), creating the original agreement from extraction, email notifications, deployment (Render), backup/restore test, held-out AI evaluation set (only 12 development cases exist), real-user replay. See [decisions](docs/pact/11-evidence-decisions.md) D11–D20 for deviations from the blueprint.
 

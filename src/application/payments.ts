@@ -508,7 +508,20 @@ async function submitRefund(op: RefundRow): Promise<RefundRow> {
     });
   }
   const confirmed = await paymentProvider().getRefund(refund.id).catch(() => refund);
-  return applyRefund(op.tenant_id, op.id, confirmed);
+  const row = await applyRefund(op.tenant_id, op.id, confirmed);
+  await refreshCaptureStatus(capture);
+  return row;
+}
+
+/** Re-reads the capture after a refund so the displayed provider status matches PayPal (e.g. PARTIALLY_REFUNDED). */
+async function refreshCaptureStatus(capture: CaptureRow): Promise<void> {
+  const fresh = await paymentProvider().getCapture(capture.provider_capture_id).catch(() => null);
+  if (!fresh || !SETTLED_CAPTURE.includes(fresh.status)) return;
+  await pool().query("UPDATE captures SET provider_status = $2, updated_at = now() WHERE id = $1 AND provider_status = ANY($3)", [
+    capture.id,
+    fresh.status,
+    SETTLED_CAPTURE,
+  ]);
 }
 
 function refundStatus(providerStatus: string): RefundRow["status"] {

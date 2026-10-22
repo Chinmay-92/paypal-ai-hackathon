@@ -20,7 +20,7 @@ function toError(err: unknown) {
 }
 
 /** Shows the review link once, with a drafted message the merchant sends themselves. */
-function LinkResult({ url, customerName, title }: { url: string; customerName?: string; title?: string }) {
+function LinkResult({ url, customerName, title, onDone }: { url: string; customerName?: string; title?: string; onDone?: () => void }) {
   const message = `Hi ${customerName ?? "there"}, the updated terms for "${title ?? "your order"}" are ready. Please review and approve or decline here: ${url}`;
   return (
     <div className="notice ok" role="status">
@@ -37,6 +37,11 @@ function LinkResult({ url, customerName, title }: { url: string; customerName?: 
         <button type="button" onClick={() => navigator.clipboard?.writeText(message)}>
           Copy drafted message
         </button>
+        {onDone && (
+          <button type="button" className="primary" onClick={onDone}>
+            Done
+          </button>
+        )}
       </div>
     </div>
   );
@@ -59,14 +64,14 @@ export function PublishDraft(props: { jobId: string; revisionId: string; version
         <button
           type="button"
           className="primary"
-          disabled={props.disabled || busy}
+          disabled={props.disabled || busy || url !== null}
           onClick={async () => {
             setBusy(true);
             setError(null);
             try {
               const res = await postJson<{ reviewUrl: string }>(`/api/jobs/${props.jobId}/revisions/${props.revisionId}/publish`, { expectedVersion: props.version, confirmFeasibility: props.started ? feasible : undefined });
+              // Keep the link on screen; refreshing now would unmount this draft panel.
               setUrl(res.reviewUrl);
-              router.refresh();
             } catch (err) {
               setError(toError(err));
             } finally {
@@ -93,7 +98,7 @@ export function PublishDraft(props: { jobId: string; revisionId: string; version
         </button>
       </div>
       <ErrorBox error={error} />
-      {url && <LinkResult url={url} customerName={props.customerName} title={props.title} />}
+      {url && <LinkResult url={url} customerName={props.customerName} title={props.title} onDone={() => router.refresh()} />}
     </div>
   );
 }
@@ -172,8 +177,8 @@ export function RefundForm({ captureId }: { captureId: string }) {
   const [error, setError] = useState<{ message: string; items: string[] } | null>(null);
   if (!open) {
     return (
-      <button type="button" className="link" onClick={() => setOpen(true)}>
-        Refund…
+      <button type="button" onClick={() => setOpen(true)}>
+        Refund this payment…
       </button>
     );
   }

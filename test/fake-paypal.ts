@@ -124,6 +124,11 @@ export class FakePayPal implements PaymentProvider {
     return this.idem(`refund:${req.requestId}`, "refundCapture", () => {
       const refund: ProviderRefund = { id: `REF-${randomUUID().slice(0, 8)}`, status: this.refundStatus, amount: req.amount, captureId: req.captureId };
       this.refunds.set(refund.id, refund);
+      if (refund.status === "COMPLETED") {
+        const cap = this.captures.get(req.captureId)!;
+        const refunded = [...this.refunds.values()].filter((r) => r.captureId === req.captureId && r.status === "COMPLETED").reduce((n, r) => n + r.amount.minor, 0);
+        cap.status = refunded >= cap.amount.minor ? "REFUNDED" : "PARTIALLY_REFUNDED";
+      }
       return refund;
     });
   }

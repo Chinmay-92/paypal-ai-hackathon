@@ -248,6 +248,7 @@ describe("refunds", () => {
     expect(a.status).toBe("COMPLETED");
     expect(w.paypal.refunds.size).toBe(1);
     expect((await obligation(capture.obligation_id)).status).toBe("PARTIALLY_REFUNDED");
+    expect((await one<CaptureRow>(pool(), "SELECT * FROM captures WHERE id = $1", [capture.id]))!.provider_status).toBe("PARTIALLY_REFUNDED");
   });
 
   it("concurrent refunds cannot exceed the capture, including pending ones", async () => {
