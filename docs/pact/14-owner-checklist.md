@@ -8,24 +8,24 @@ Never paste secrets, sandbox passwords or API keys into chat, issues, commits or
 
 - [ ] Enter Pact in **Business Solutions**: a tool that helps merchants and freelancers run their business. Pact keeps customer changes, approvals, PayPal payments and work instructions in sync. Don't choose *AI Agents or Automation*: that track asks for agents that transact on the user's behalf, and Pact deliberately never lets AI move money (every payment is approved by the buyer). Recorded as decision D28.
 
-## 1. Deploy on Render (about 15 minutes)
+## 1. Deploy on Render (done: https://pact-web-h9pp.onrender.com)
 
 PRs #4 and #5 are merged, so `main` is ready.
 
-- [ ] In the Render dashboard, choose **New → Blueprint** and pick `Chinmay-92/paypal-ai-hackathon`. It creates `pact-db` and `pact-web`, both free.
-- [ ] Enter the prompted values:
+- [x] In the Render dashboard, choose **New → Blueprint** and pick `Chinmay-92/paypal-ai-hackathon`. It creates `pact-db` and `pact-web`, both free.
+- [x] Enter the prompted values:
   - `APP_ORIGIN`: the service URL, e.g. `https://pact-web.onrender.com`
   - `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`: sandbox values
   - `PAYPAL_WEBHOOK_ID`: `pending` for now
   - `GEMINI_API_KEY`
-- [ ] Wait for the first deploy. If the real URL differs from your `APP_ORIGIN`, fix it under **pact-web → Environment**.
-- [ ] Open `https://<host>/api/health`. It should show `"database":"ok","payments":"paypal-sandbox"`.
-- [ ] Tell Claude the URL so it can check the deployment end to end.
+- [x] Wait for the first deploy. If the real URL differs from your `APP_ORIGIN`, fix it under **pact-web → Environment**.
+- [x] Open `https://<host>/api/health`. It should show `"database":"ok","payments":"paypal-sandbox"`.
+- [x] Tell Claude the URL. It was checked on 2026-10-22: health, demo workspace, approval, and a sandbox order with redirect to PayPal.
 
 ## 2. Point PayPal webhooks at Render
 
 - [ ] In developer.paypal.com (Sandbox), go to **Apps & Credentials → Default Application → Sandbox Webhooks**.
-- [ ] Edit the old tunnel webhook (or add a new one) to `https://<host>/api/paypal/webhook`, with events `CHECKOUT.ORDER.APPROVED` and all `PAYMENT.CAPTURE.*`.
+- [ ] Edit the old tunnel webhook (or add a new one) to `https://pact-web-h9pp.onrender.com/api/paypal/webhook`, with events `CHECKOUT.ORDER.APPROVED` and all `PAYMENT.CAPTURE.*`.
 - [ ] Copy the Webhook ID into `PAYPAL_WEBHOOK_ID` on Render. Saving redeploys.
 - [ ] Delete the old tunnel webhook if you added a new one.
 

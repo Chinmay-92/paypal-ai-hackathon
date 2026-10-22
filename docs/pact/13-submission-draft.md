@@ -24,7 +24,7 @@ The same engine runs two domains: custom apparel and a website project.
 
 ## How we built it
 
-TypeScript, Next.js 16 / React 19, PostgreSQL, PayPal Orders v2 and Payments v2 REST APIs (sandbox), and Gemini through `@google/genai`. TODO: confirm hosting (Render Blueprint in the repo) once deployed.
+TypeScript, Next.js 16 / React 19, PostgreSQL, PayPal Orders v2 and Payments v2 REST APIs (sandbox), and Gemini through `@google/genai`. Hosted on Render: https://pact-web-h9pp.onrender.com
 
 PayPal usage:
 - An Orders v2 `CAPTURE` checkout per payment obligation, with a stable `PayPal-Request-Id` for each durable operation.
@@ -58,7 +58,7 @@ A deterministic baseline runs if the model is unavailable. Model output can only
 
 Put credentials **only** in Devpost's private testing-instructions field, never in the repository.
 
-1. Open TODO-HOSTED-URL/demo and click **Create my demo workspace**. You are signed in as the business owner of a private synthetic workspace.
+1. Open https://pact-web-h9pp.onrender.com/demo and click **Create my demo workspace**. You are signed in as the business owner of a private synthetic workspace.
 2. Open a customer link in a private window. Approve, then pay with the PayPal sandbox buyer: email TODO, password TODO. Always log in on PayPal's page; never enter a real card.
 3. Back in the workspace, paste `Make ten of those hoodies instead. Use the attached logo on everything.` (optionally attach an image), resolve sizes, publish, approve as the customer, and pay the top-up.
 4. Release work and open the job sheet. Try a refund from Payments.
