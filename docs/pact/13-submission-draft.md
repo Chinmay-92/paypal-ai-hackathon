@@ -43,6 +43,7 @@ A deterministic baseline runs if the model is unavailable. Model output can only
 ## Verified (2026-10-22)
 
 - PayPal sandbox, driven through the UI with a sandbox buyer: $300 deposit captured; amendment approved and $100 top-up captured; work released; $10 partial refund completed. Each provider resource was re-read independently. Three real webhook deliveries (order approved, capture completed, capture refunded) were signature-verified and processed once each.
+- Hosted on Render: a sandbox deposit capture plus webhook, and a partial refund plus webhook, verified on https://pact-web-h9pp.onrender.com (2026-10-22).
 - Automated tests: unit plus PostgreSQL integration tests (83 at the time of writing). They cover duplicate payments, lost provider responses, payment after a revision was replaced, forged webhooks, stale approvals, concurrent edits, cross-tenant access, attachments, and the model being unavailable. Failure injection uses an in-memory PayPal test double.
 - AI evaluation (`reports/ai-eval-latest.json`, synthetic): deterministic baseline 12/12 on dev cases (which it was written against) and 20/32 intent on held-out cases, with field recall 6/20 and precision 6/8. TODO: model numbers. The model run is blocked by the free-tier Gemini quota (all calls returned HTTP 429 on 2026-10-22).
 
