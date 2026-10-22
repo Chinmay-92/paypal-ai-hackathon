@@ -93,7 +93,9 @@ Verified against the real PayPal sandbox on 2026-10-22, driven through the app U
 - Partial refund: $10.00 refund `COMPLETED`, re-read independently. The capture is now `PARTIALLY_REFUNDED` at PayPal.
 - An unapproved order returning to the app was refused (`PAYER_ACTION_REQUIRED`) and recorded no funding.
 
-Not yet verified in the sandbox: webhook delivery and signature verification (needs a public webhook URL and `PAYPAL_WEBHOOK_ID`).
+- Webhooks: real sandbox deliveries through a temporary tunnel, for `CHECKOUT.ORDER.APPROVED`, `PAYMENT.CAPTURE.COMPLETED` and `PAYMENT.CAPTURE.REFUNDED`. Each passed PayPal's signature verification, was stored once by event ID and was processed after re-reading the resource. The approval event and the browser return raced on the same order and produced exactly one capture.
+
+Webhook setup: add `https://<public-url>/api/paypal/webhook` to the sandbox app, subscribe it to `CHECKOUT.ORDER.APPROVED` and `PAYMENT.CAPTURE.*`, and put its ID in `PAYPAL_WEBHOOK_ID`. Unsigned or unverifiable events are rejected with 400. A hosted deployment needs a stable URL; quick tunnels change on restart.
 
 Not implemented yet: attachment upload and storage (artwork is chosen from catalog IDs), creating the original agreement from extraction, email notifications, deployment (Render), backup/restore test, held-out AI evaluation set (only 12 development cases exist), real-user replay. See [decisions](docs/pact/11-evidence-decisions.md) D11–D20 for deviations from the blueprint.
 

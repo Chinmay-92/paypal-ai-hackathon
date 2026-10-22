@@ -86,11 +86,30 @@ export function ScopeEditor({
                     Mark unresolved
                   </button>
                 </div>
+                <SizeTotal sizes={value as Record<string, number> | null} quantity={f.quantityField ? scope[f.quantityField] : undefined} />
               </fieldset>
             )}
           </div>
         );
       })}
     </div>
+  );
+}
+
+/** Live check that a size breakdown adds up to its quantity, announced to screen readers. */
+function SizeTotal({ sizes, quantity }: { sizes: Record<string, number> | null; quantity: ScopeValue | undefined }) {
+  if (sizes === null) return null;
+  const total = Object.values(sizes).reduce((a, b) => a + b, 0);
+  const target = typeof quantity === "number" ? quantity : null;
+  const ok = target === null || total === target;
+  return (
+    <p className="small" aria-live="polite" style={{ margin: "0.3rem 0 0" }}>
+      <span className={`badge ${ok ? "ok" : "warn"}`}>
+        <span aria-hidden="true">{ok ? "✓" : "!"}</span>
+        Sizes total {total}
+        {target !== null && ` of ${target}`}
+      </span>
+      {!ok && target !== null && <span> {total < target ? `${target - total} still to assign` : `${total - target} too many`}</span>}
+    </p>
   );
 }

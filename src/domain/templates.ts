@@ -14,6 +14,8 @@ export type FieldDef = {
   catalog?: "artwork";
   /** For sizes fields: allowed size keys. */
   sizes?: readonly string[];
+  /** For sizes fields: the quantity field the breakdown must add up to. */
+  quantityField?: string;
   help?: string;
 };
 
@@ -65,9 +67,9 @@ const apparel: Template = {
   physicalGoods: true,
   fields: [
     { path: "shirts_qty", label: "T-shirts", type: "int" },
-    { path: "shirts_sizes", label: "T-shirt sizes", type: "sizes", sizes: APPAREL_SIZES },
+    { path: "shirts_sizes", label: "T-shirt sizes", type: "sizes", sizes: APPAREL_SIZES, quantityField: "shirts_qty" },
     { path: "hoodies_qty", label: "Hoodies", type: "int" },
-    { path: "hoodies_sizes", label: "Hoodie sizes", type: "sizes", sizes: APPAREL_SIZES },
+    { path: "hoodies_sizes", label: "Hoodie sizes", type: "sizes", sizes: APPAREL_SIZES, quantityField: "hoodies_qty" },
     { path: "garment_color", label: "Garment colour", type: "text" },
     { path: "artwork", label: "Artwork", type: "catalog", catalog: "artwork", help: "Approved artwork asset" },
     { path: "delivery_date", label: "Delivery date", type: "date" },
