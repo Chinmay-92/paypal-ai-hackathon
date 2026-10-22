@@ -14,8 +14,9 @@ function input(domain: "apparel" | "website", body: string): ExtractionInput {
   return { baseRevisionId: "rev-1", domain, scope: SCOPES[domain], catalog: TEMPLATES[domain].defaultCatalog, sources: [{ id: "m1", authorLabel: "Customer", authorRole: "customer", body }] };
 }
 
-type Case = { id: string; domain: "apparel" | "website"; message: string; expected_intent: string };
-const cases = JSON.parse(readFileSync("fixtures/pact/ai-cases.json", "utf8")) as Case[];
+type Case = { id: string; domain: "apparel" | "website"; split: "dev" | "heldout"; message: string; expected_intent: string };
+// Only the development split is asserted. Held-out results are measured by `npm run eval:ai`, never tuned against.
+const cases = (JSON.parse(readFileSync("fixtures/pact/ai-cases.json", "utf8")) as Case[]).filter((c) => c.split === "dev");
 
 describe("deterministic baseline on the synthetic development cases", () => {
   // These cases informed the baseline rules; passing them is not held-out evidence.

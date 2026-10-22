@@ -44,7 +44,15 @@ export default async function FulfillmentPage(props: PageProps<"/app/jobs/[id]/f
           {s.lines.map((l) => (
             <div key={l.label} style={{ display: "contents" }}>
               <dt>{l.label}</dt>
-              <dd style={{ textAlign: "left" }}>{l.value}</dd>
+              <dd style={{ textAlign: "left" }}>
+                {l.value}
+                {l.attachmentId && (
+                  <div>
+                    {/* eslint-disable-next-line @next/next/no-img-element -- private, session-authorized file */}
+                    <img src={`/api/attachments/${l.attachmentId}`} alt={`Artwork file: ${l.value}`} style={{ maxWidth: 240, maxHeight: 240, border: "1px solid var(--border)", marginTop: "0.4rem" }} />
+                  </div>
+                )}
+              </dd>
             </div>
           ))}
         </dl>

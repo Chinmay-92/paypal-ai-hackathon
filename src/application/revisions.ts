@@ -5,7 +5,7 @@ import {
   audit,
   expectVersion,
   getRevision,
-  loadCatalog,
+  loadJobCatalog,
   lockJob,
   newId,
   updateJob,
@@ -26,7 +26,7 @@ export type DraftInput = {
 };
 
 async function assertFieldTypes(tx: Tx, job: JobRow, scope: Scope): Promise<void> {
-  const catalog = await loadCatalog(tx, job.tenant_id, job.domain);
+  const catalog = await loadJobCatalog(tx, job);
   const t = template(job.domain);
   const errors: string[] = [];
   for (const key of Object.keys(scope)) {
@@ -141,7 +141,7 @@ export async function publishRevision(
     if (rev.predecessor_id !== base) {
       throw new ConflictError("The agreement changed after this draft was created. Discard it and review the current version.");
     }
-    const catalog = await loadCatalog(tx, job.tenant_id, job.domain);
+    const catalog = await loadJobCatalog(tx, job);
     const problems = publishProblems(rev.content, catalog);
     if (problems.length) throw new UnprocessableError("Resolve these items before publishing", { problems });
     if (job.started_at && !input.confirmFeasibility) {

@@ -34,9 +34,10 @@ export const AddMessageInput = z.object({
   authorRole: z.enum(["customer", "merchant"]),
   sentAtLabel: z.string().trim().max(60).optional(),
   body: z.string().trim().min(1).max(8000),
+  attachmentIds: z.array(z.uuid()).max(5).optional(),
 });
 
-export const PortalMessageInput = z.object({ body: z.string().trim().min(1).max(4000) });
+export const PortalMessageInput = z.object({ body: z.string().trim().min(1).max(4000), attachmentIds: z.array(z.uuid()).max(5).optional() });
 
 export const ReviewChangeInput = z.discriminatedUnion("decision", [
   z.object({
@@ -83,5 +84,7 @@ export const ResolveCaptureInput = z.object({
   resolution: z.enum(["credit_to_current", "refund_review"]),
   note: z.string().trim().min(3).max(500),
 });
+
+export const ExtractOriginalInput = z.object({ domain: z.enum(["apparel", "website"]), text: z.string().trim().min(10).max(8000) });
 
 export const LoginInput = z.object({ email: z.email(), password: z.string().min(1).max(200) });

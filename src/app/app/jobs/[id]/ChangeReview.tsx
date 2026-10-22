@@ -2,13 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
-import { formatScopeValue, TEMPLATES, type CatalogEntry, type Domain, type FieldDef, type LineItem, type RateCardEntry, type Scope } from "@/domain/templates";
+import { TEMPLATES, type CatalogEntry, type Domain, type FieldDef, type LineItem, type RateCardEntry, type Scope } from "@/domain/templates";
 import type { Proposal } from "@/integrations/ai/contract";
 import { detailList, postJson } from "@/ui/api";
 import { Badge } from "@/ui/Badge";
 import { label } from "@/ui/format";
 import { LineItemsEditor } from "@/ui/LineItemsEditor";
 import { ScopeEditor } from "@/ui/ScopeEditor";
+import { ValueView } from "@/ui/ValueView";
 
 type Cr = { id: string; status: string; intent: string | null; extractor: string | null; issues: string[]; draftReply: string | null; baseRevisionId: string; createdAt: string };
 
@@ -42,6 +43,7 @@ export function ChangeReview(props: {
   domain: Domain;
   rateCard: RateCardEntry[];
   artwork: CatalogEntry[];
+  labels: Record<string, string>;
   depositBps: number;
   started: boolean;
   canEdit: boolean;
@@ -136,10 +138,14 @@ export function ChangeReview(props: {
                 <tr key={i}>
                   <th scope="row">{props.fields.find((f) => f.path === c.field)?.label ?? c.field}</th>
                   <td className="old">
-                    <del>{formatScopeValue(c.oldValue)}</del>
+                    <del>
+                      <ValueView value={c.oldValue} labels={props.labels} />
+                    </del>
                   </td>
                   <td className="new">
-                    <ins>{formatScopeValue(c.proposedValue)}</ins>
+                    <ins>
+                      <ValueView value={c.proposedValue} labels={props.labels} />
+                    </ins>
                     {!c.supported && (
                       <div>
                         <Badge status="FAILED" text="Not supported" /> <span className="small">{c.issue}</span>

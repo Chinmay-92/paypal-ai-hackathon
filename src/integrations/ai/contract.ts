@@ -54,9 +54,18 @@ export type Proposal = {
   draftReply: string;
 };
 
-export type SourceForExtraction = { id: string; authorLabel: string; authorRole: string; body: string };
+export type SourceAttachment = {
+  /** Catalog value for an image ("att:<uuid>"), or null for a document that cannot be used as artwork. */
+  id: string | null;
+  filename: string;
+  contentType: string;
+};
+
+export type SourceForExtraction = { id: string; authorLabel: string; authorRole: string; body: string; attachments?: SourceAttachment[] };
 
 export type ExtractionInput = {
+  /** "amendment" compares against an agreed scope; "original" extracts a first agreement from an empty scope. */
+  mode?: "amendment" | "original";
   baseRevisionId: string;
   domain: Domain;
   scope: Scope;

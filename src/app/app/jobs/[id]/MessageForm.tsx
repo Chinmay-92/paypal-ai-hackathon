@@ -3,11 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { postJson } from "@/ui/api";
+import { FilePicker, type Uploaded } from "@/ui/FilePicker";
 
 export function MessageForm({ jobId, customerName }: { jobId: string; customerName: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [files, setFiles] = useState<Uploaded[]>([]);
   return (
     <form
       style={{ marginTop: "1rem" }}
@@ -23,8 +25,10 @@ export function MessageForm({ jobId, customerName }: { jobId: string; customerNa
             authorRole: data.get("role"),
             sentAtLabel: data.get("sentAt") || undefined,
             body: data.get("body"),
+            attachmentIds: files.map((f) => f.id),
           });
           form.reset();
+          setFiles([]);
           router.refresh();
         } catch (err) {
           setError((err as Error).message);
@@ -58,6 +62,19 @@ export function MessageForm({ jobId, customerName }: { jobId: string; customerNa
         <label htmlFor="body">Message</label>
         <textarea id="body" name="body" required maxLength={8000} />
       </div>
+      <FilePicker id={`msg-file-${jobId}`} url={`/api/jobs/${jobId}/attachments`} label="Files sent with this message" onUploaded={(f) => setFiles((x) => [...x, f])} />
+      {files.length > 0 && (
+        <ul className="small">
+          {files.map((f) => (
+            <li key={f.id}>
+              {f.filename}{" "}
+              <button type="button" className="link" onClick={() => setFiles((x) => x.filter((y) => y.id !== f.id))}>
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
       {error && (
         <p role="alert" className="notice bad">
           {error}

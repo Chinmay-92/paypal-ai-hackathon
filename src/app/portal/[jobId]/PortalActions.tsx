@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { postJson } from "@/ui/api";
+import { FilePicker, type Uploaded } from "@/ui/FilePicker";
 import { money } from "@/ui/format";
 
 export function Decision({ revisionId, contentHash, dueNowMinor }: { revisionId: string; contentHash: string; dueNowMinor: number }) {
@@ -124,14 +125,16 @@ export function AskQuestion() {
   const router = useRouter();
   const [body, setBody] = useState("");
   const [status, setStatus] = useState<string | null>(null);
+  const [files, setFiles] = useState<Uploaded[]>([]);
   return (
     <form
       className="panel"
       onSubmit={async (e) => {
         e.preventDefault();
         try {
-          await postJson("/api/portal/messages", { body });
+          await postJson("/api/portal/messages", { body, attachmentIds: files.map((f) => f.id) });
           setBody("");
+          setFiles([]);
           setStatus("Sent to the business. Asking a question does not change your order.");
           router.refresh();
         } catch (err) {
@@ -142,6 +145,10 @@ export function AskQuestion() {
       <h2>Ask a question or request a change</h2>
       <label htmlFor="q">Message to the business</label>
       <textarea id="q" value={body} onChange={(e) => setBody(e.target.value)} required maxLength={4000} />
+      <div style={{ marginTop: "0.5rem" }}>
+        <FilePicker id="portal-file" url="/api/portal/attachments" label="Attach artwork or a document (optional)" onUploaded={(f) => setFiles((x) => [...x, f])} />
+        {files.length > 0 && <p className="small">Attached: {files.map((f) => f.filename).join(", ")}</p>}
+      </div>
       <div aria-live="polite">{status && <p className="small">{status}</p>}</div>
       <button type="submit" style={{ marginTop: "0.5rem" }}>
         Send

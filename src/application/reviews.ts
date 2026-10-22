@@ -8,6 +8,7 @@ import {
   getJob,
   getRevision,
   listObligations,
+  loadJobCatalog,
   lockJob,
   newId,
   setObligationStatus,
@@ -118,6 +119,7 @@ export async function portalView(actor: CustomerActor) {
   const effective = job.effective_revision_id ? await getRevision(db, actor.tenantId, job.effective_revision_id) : null;
   const pending = job.pending_revision_id ? await getRevision(db, actor.tenantId, job.pending_revision_id) : null;
   const invitation = await one<{ revision_id: string; revoked_at: Date | null }>(db, "SELECT revision_id, revoked_at FROM review_invitations WHERE id = $1", [actor.invitationId]);
+  const catalog = await loadJobCatalog(db, job);
   const payable = obligations.filter((o) => o.revision_id === job.effective_revision_id && ["DUE", "PROCESSING", "FAILED", "UNKNOWN", "PENDING"].includes(o.status));
   return {
     job: { id: job.id, title: job.title, domain: job.domain, version: job.version, fulfillmentState: job.fulfillment_state, currency: job.currency, timezone: job.timezone, startedAt: job.started_at },
@@ -134,6 +136,7 @@ export async function portalView(actor: CustomerActor) {
     reviewPayments: obligations.filter((o) => o.status === "REVIEW_REQUIRED"),
     linkReplaced: invitation?.revoked_at !== null && invitation?.revision_id !== job.pending_revision_id,
     decisions,
+    artworkLabels: Object.fromEntries(catalog.artwork.map((a) => [a.id, a.label])),
   };
 }
 

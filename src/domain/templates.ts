@@ -194,8 +194,10 @@ export function checkFieldValue(def: FieldDef, value: ScopeValue, catalog: { art
   }
 }
 
-export function formatScopeValue(value: ScopeValue | undefined): string {
+/** Human-readable value. Pass catalog labels so artwork IDs display as names. */
+export function formatScopeValue(value: ScopeValue | undefined, labels?: Record<string, string>): string {
   if (value === null || value === undefined) return "Unresolved";
+  if (typeof value === "string" && labels?.[value]) return labels[value];
   if (typeof value === "boolean") return value ? "Yes" : "No";
   if (typeof value === "object") {
     // JSONB does not keep key order; show sizes in garment order.

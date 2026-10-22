@@ -91,8 +91,13 @@ export function baselineExtract(input: ExtractionInput): Omit<Proposal, "propose
     }
     const art = span(segment, /\b(?:use|change|replace|swap|new)\b[^.;]*\b(?:logo|artwork|design)\b[^.;]*/i);
     if (art) {
-      change("artwork", null, art.text);
-      missing.push(`Which artwork asset replaces ${formatScopeValue(scope.artwork ?? null)}? Attach or select the file.`);
+      const images = (source.attachments ?? []).filter((a) => a.id !== null);
+      if (/\battach/i.test(art.text) && images.length === 1) {
+        change("artwork", images[0].id, art.text);
+      } else {
+        change("artwork", null, art.text);
+        missing.push(`Which artwork asset replaces ${formatScopeValue(scope.artwork ?? null)}? Attach or select the file.`);
+      }
     }
   } else {
     const booking = span(segment, /\b(?:add|include)\s+(?:an?\s+)?(?:appointment\s+)?booking\b/i);

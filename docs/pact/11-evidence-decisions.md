@@ -45,6 +45,10 @@ Research accessed October 19–20, 2026. Evidence is not an endorsement of vendo
 - D21: Render Blueprint (`render.yaml`). The owner chose free tiers for now (2026-10-22): free web and free Postgres, no worker (Render has no free worker plan), and migrations on start. Gate: before submission, upgrade Postgres (free expires after 30 days, before judging ends December 15) and the web service (free sleeps after 15 minutes). Render docs checked 2026-10-22.
 - D22: Hosted demo mode (`PACT_DEMO_MODE=true`) creates an isolated synthetic tenant per visitor at `/demo`, rate-limited per IP and capped per day, instead of sharing one demo login. Sandbox buyer credentials are given to judges privately, not in source.
 - D23: `tsx` is a runtime dependency, because migrations and the worker run TypeScript directly on the host. In production, `APP_ORIGIN` is required for links and redirects behind the proxy.
+- D24: Attachments are stored in PostgreSQL (`bytea`) with immutable bytes and hash, not in separate object storage, and access is authorized per request by session rather than through short-lived signed URLs. This is simpler for the prototype and fits Render's free database. Move to private object storage before real customer files. This supersedes the attachment gap in D19.
+- D25: Creating the original agreement from a pasted quote is proposal-only: the endpoint stores nothing, and the merchant reviews cited values in the new-job form. This replaces the gap in D20.
+- D26: When the primary model returns 429, 5xx or a timeout, the extractor retries once on `GEMINI_FALLBACK_MODEL` (default `gemini-3.5-flash`), then falls back to the deterministic baseline. Every proposal records the model actually used.
+- D27: The AI evaluation set has 44 synthetic cases: 12 development cases (which informed the baseline and prompt) and 32 held-out cases written after both were frozen. Held-out results are reported, never asserted in tests or used for tuning.
 
 ## Open decisions and gates
 

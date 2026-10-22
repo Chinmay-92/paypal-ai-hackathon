@@ -29,7 +29,7 @@ export function ScopeEditor({
         return (
           <div className="field" key={f.path} style={f.type === "sizes" || f.type === "text" ? { gridColumn: "1 / -1" } : undefined}>
             <label htmlFor={id}>
-              {f.label} {changed && <span className="badge accent">Proposed change</span>}{" "}
+              {f.label} {changed && <span className="badge accent">Proposed</span>}{" "}
               {unresolved && <span className="badge warn">Unresolved</span>}
             </label>
             {f.type === "int" && (
