@@ -116,7 +116,7 @@ Verified against the real PayPal sandbox on 2026-10-22, driven through the app U
 
 Webhook setup: add `https://<public-url>/api/paypal/webhook` to the sandbox app, subscribe it to `CHECKOUT.ORDER.APPROVED` and `PAYMENT.CAPTURE.*`, and put its ID in `PAYPAL_WEBHOOK_ID`. Unsigned or unverifiable events are rejected with 400. A hosted deployment needs a stable URL; quick tunnels change on restart.
 
-Hosted on Render (2026-10-22): health OK; demo workspace created; customer approval; the PayPal sandbox order is created and redirects to PayPal checkout. Not yet verified on the hosted site: buyer capture and webhooks, which need the owner's sandbox buyer and a webhook ID.
+Hosted on Render, verified 2026-10-22: health OK, demo workspace, customer approval, and a $300 deposit paid with a sandbox buyer (capture `2SF23899FK666022D`). The `PAYMENT.CAPTURE.COMPLETED` webhook was signature-verified and matched to the same capture, with no double count. A $5 partial refund (`0A451203K7451645B`) completed, and its webhook was processed idempotently. The first checkout pointed at an order PayPal no longer had (404); this exposed a bug, fixed in PR #8, so Pact now opens a new order.
 
 Not implemented yet: email notifications, separate object storage (attachments live in PostgreSQL for now), backup/restore test, real-user replay. The AI evaluation has 44 synthetic cases (12 dev, 32 held-out); see `reports/ai-eval-latest.json`. See [decisions](docs/pact/11-evidence-decisions.md) D11–D20 for deviations from the blueprint.
 

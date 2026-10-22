@@ -22,11 +22,11 @@ PRs #4 and #5 are merged, so `main` is ready.
 - [x] Open `https://<host>/api/health`. It should show `"database":"ok","payments":"paypal-sandbox"`.
 - [x] Tell Claude the URL. It was checked on 2026-10-22: health, demo workspace, approval, and a sandbox order with redirect to PayPal.
 
-## 2. Point PayPal webhooks at Render
+## 2. Point PayPal webhooks at Render (done, verified 2026-10-22)
 
-- [ ] In developer.paypal.com (Sandbox), go to **Apps & Credentials → Default Application → Sandbox Webhooks**.
+- [x] In developer.paypal.com (Sandbox), go to **Apps & Credentials → Default Application → Sandbox Webhooks**.
 - [ ] Edit the old tunnel webhook (or add a new one) to `https://pact-web-h9pp.onrender.com/api/paypal/webhook`, with events `CHECKOUT.ORDER.APPROVED` and all `PAYMENT.CAPTURE.*`.
-- [ ] Copy the Webhook ID into `PAYPAL_WEBHOOK_ID` on Render. Saving redeploys.
+- [x] Copy the Webhook ID into `PAYPAL_WEBHOOK_ID` on Render. Saving redeploys.
 - [ ] Delete the old tunnel webhook if you added a new one.
 
 ## 3. Gemini quota (decide)
