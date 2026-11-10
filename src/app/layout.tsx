@@ -5,8 +5,8 @@ import "./globals.css";
 const font = Schibsted_Grotesk({ subsets: ["latin"], variable: "--font-schibsted", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Pact — Changes agreed. Work aligned.",
-  description: "Turn customer change requests into approved revisions, correct PayPal payments and current job instructions.",
+  title: "Pact — Manage changes to orders and projects",
+  description: "Review customer requests, update agreements and collect payments through PayPal.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

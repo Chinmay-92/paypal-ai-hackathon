@@ -1,5 +1,7 @@
 # Owner checklist: steps only you can do
 
+> **November 10 update — $0 limit:** Do not follow the billing or paid-upgrade suggestions in the older checklist below. The current demo is https://pact-web-mz18.onrender.com/demo in a separate free Render workspace with no card on file. Its free database expires December 10, before the stated judging end. A tested free continuity plan is still needed. A synthetic sandbox deposit, amendment, top-up, release and partial refund were exercised on November 10; see [the current submission draft](13-submission-draft.md). The full Gemini evaluation is still outstanding.
+
 Things that need your accounts, money, judgment or identity. Tick them off as you go. Deadline: **November 13, 2026, 01:30 IST** (November 12, 12:00 PST). Aim to finish by November 11. Judging runs until **December 15, 2026**, and the demo must keep working until then.
 
 Never paste secrets, sandbox passwords or API keys into chat, issues, commits or the video. Put them only in `.env.local`, the Render dashboard, or Devpost's private testing-instructions field.

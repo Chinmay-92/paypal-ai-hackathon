@@ -14,6 +14,7 @@ import { ChangeReview } from "./ChangeReview";
 import { FileUpload } from "./FileUpload";
 import { ManualAmendment } from "./ManualAmendment";
 import { MessageForm } from "./MessageForm";
+import { TelegramLink } from "./TelegramLink";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "changes", label: "Changes" },
@@ -395,14 +396,14 @@ function ConversationTab({ v, owner }: { v: MerchantJobView; owner: boolean }) {
     <div>
       <div className="panel">
         <h2>Messages</h2>
-        <p className="small muted">Pasted messages are unverified copies. Messages sent from the customer&apos;s review page are marked as such. Highlighted text is what Pact quoted.</p>
+        <p className="small muted">Pasted and Telegram messages are unverified. Messages sent from the customer&apos;s review page are marked as such. Highlighted text is what Pact quoted.</p>
         {v.messages.length === 0 && <p className="muted">No messages yet.</p>}
         {v.messages.map((m) => (
           <div className="message" key={m.id}>
             <div className="meta">
               <strong>{m.author_label}</strong>
               <span>{m.sent_at_label ? `said ${m.sent_at_label}` : when(m.created_at, v.job.timezone)}</span>
-              {m.provenance === "portal_authenticated" ? <Badge status="ACCEPTED" text="From review page" /> : <Badge status="DRAFT" text="Pasted copy" />}
+              {m.provenance === "portal_authenticated" ? <Badge status="ACCEPTED" text="From review page" /> : <Badge status="DRAFT" text={m.provenance === "telegram" ? "Telegram · identity unverified" : "Pasted copy"} />}
             </div>
             <p>
               <Highlighted text={m.body} spans={spans.get(m.id) ?? []} />
@@ -421,6 +422,7 @@ function ConversationTab({ v, owner }: { v: MerchantJobView; owner: boolean }) {
         ))}
         {owner && base && (
           <div className="section">
+            <TelegramLink jobId={v.job.id} />
             <MessageForm jobId={v.job.id} customerName={v.customer.name} />
           </div>
         )}

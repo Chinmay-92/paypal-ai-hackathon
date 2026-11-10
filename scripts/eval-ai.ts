@@ -57,6 +57,9 @@ async function main() {
         r = await run();
       } catch (err) {
         error = err instanceof Error ? err.message.slice(0, 200) : String(err);
+        if (name === "model" && /\b429\b|RESOURCE_EXHAUSTED/i.test(error)) {
+          throw new Error(`Stopped evaluation at ${c.id}: Gemini reported a rate or quota limit.`);
+        }
       }
       const intent = r?.proposal.intent ?? "error";
       t.total++;

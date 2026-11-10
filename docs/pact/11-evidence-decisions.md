@@ -51,6 +51,21 @@ Research accessed October 19–20, 2026. Evidence is not an endorsement of vendo
 - D27: The AI evaluation set has 44 synthetic cases: 12 development cases (which informed the baseline and prompt) and 32 held-out cases written after both were frozen. Held-out results are reported, never asserted in tests or used for tuning.
 - D28: Hackathon track: **Business Solutions**. Pact is a tool that helps merchants and freelancers keep changes, approvals, payments and work instructions aligned. Not *AI Agents or Automation*: that track asks for agents that transact on a user's behalf, which conflicts with the rule that AI cannot authorize charges. Every PayPal payment in Pact is approved by the buyer.
 
+## Deployment update (2026-11-10)
+
+- The owner set a $0 limit. A separate Render Hobby workspace without a payment method has a new free web service and free PostgreSQL database; the earlier deployment was not replaced. Render reports the new database expires on December 10, before the stated December 15 judging end. A tested $0 continuity plan is still required. Free-service limits can cause suspension.
+- Automatic Blueprint sync was disabled to prevent an unreviewed infrastructure change. The new demo's runtime is configured for `gemini-3.5-flash-lite` with its model retry disabled by setting the fallback to the same model; this differs from D11 and D26. Model performance and the current sandbox payment workflow are not yet verified by this configuration alone.
+- The evaluation now stops on a reported Gemini rate or quota limit instead of continuing through remaining cases. Use a single free-tier model and disable model fallback when running it under the $0 constraint. No model evaluation result is claimed until a run completes and is reviewed.
+- On November 10, the new host returned a healthy database and reported the sandbox and `gemini-3.5-flash-lite`. In a synthetic apparel workspace, a buyer approved R1 and paid a $300 sandbox deposit; a cited Gemini hoodie substitution was reviewed, published and approved; the buyer paid a $100 top-up. Pact displayed both captures as completed, released R2, displayed R2 on the job sheet and reported a $10 partial refund as completed. Its timeline recorded the captures as verified with PayPal, including webhook-sourced records for each, and the refund as verified with PayPal. This single model example is not the held-out evaluation.
+
+## Interface refresh (2026-11-10)
+
+- The local demo interface uses a cloudscape and crystalline agreement illustration on the landing page, plus a refreshed merchant sidebar. This is a presentation change; agreement, approval, and payment rules remain unchanged. The refresh has not been deployed.
+
+## Telegram intake (2026-11-10)
+
+- Added optional private-chat text intake using a one-use, job-scoped link. Telegram messages remain unverified source data and create reviewable change requests; no agreement or payment is approved by the bot. The bot sends no messages. This requires a database migration, a secret token, and webhook configuration; deployment and live end-to-end verification are separate steps. The supplied bot responded to Telegram getMe; its webhook was not configured. Local production build, typecheck, lint, documentation checks and isolated webhook-secret test passed. The PostgreSQL integration suite could not be run in this environment (Vitest startup failed and no local PostgreSQL server was available).
+
 ## Open decisions and gates
 
 | Item | Gate |

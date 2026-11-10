@@ -52,7 +52,7 @@ export default async function HistoryPage(props: PageProps<"/app/jobs/[id]/histo
       </div>
       <div className="panel">
         <h2>Timeline</h2>
-        <p className="small muted">Append-only. System-observed events are separated from user-supplied correspondence, which is never treated as proof of authorship.</p>
+        <p className="small muted">History can’t be edited. Events recorded by Pact are shown separately from pasted messages, whose authorship can’t be verified.</p>
         <ol className="timeline">
           {v.events.map((e) => (
             <li key={e.id}>

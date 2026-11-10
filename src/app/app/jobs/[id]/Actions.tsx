@@ -214,7 +214,7 @@ export function RefundForm({ captureId }: { captureId: string }) {
           <input id={`rr-${captureId}`} name="reason" required minLength={3} maxLength={255} />
         </div>
       </div>
-      <p className="small muted">You decide refunds. A submitted refund is not the same as money arriving; Pact tracks pending and completed separately.</p>
+      <p className="small muted">You decide whether to issue a refund. Once submitted, it may still be pending; check its status for confirmation.</p>
       <div className="row">
         <button className="danger" type="submit">
           Submit refund

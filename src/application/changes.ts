@@ -33,13 +33,21 @@ export async function addMessage(
   input: z.infer<typeof AddMessageInput>,
 ): Promise<{ messageId: string; changeRequestId: string }> {
   if (actor.kind === "merchant") requireOwner(actor);
-  return withTx(async (tx) => {
+  return withTx((tx) => addMessageInTx(tx, actor, jobId, input));
+}
+
+/** The caller owns the transaction so external update deduplication is atomic. */
+export async function addMessageInTx(
+  tx: Tx, actor: MerchantActor | CustomerActor, jobId: string, input: z.infer<typeof AddMessageInput>,
+  source: "telegram" | undefined = undefined,
+): Promise<{ messageId: string; changeRequestId: string }> {
+    if (actor.kind === "merchant") requireOwner(actor);
     const job = await lockJob(tx, actor.tenantId, jobId);
     if (actor.kind === "customer" && actor.jobId !== job.id) throw new NotFoundError("Job");
     const base = job.effective_revision_id ?? job.pending_revision_id;
     if (!base) throw new ConflictError("Publish the original agreement before adding correspondence");
     const messageId = newId();
-    const provenance = actor.kind === "customer" ? "portal_authenticated" : "user_supplied";
+    const provenance = source === "telegram" ? "telegram" : actor.kind === "customer" ? "portal_authenticated" : "user_supplied";
     await tx.query(
       `INSERT INTO source_messages (id, tenant_id, job_id, author_label, author_role, sent_at_label, body, provenance, content_hash, created_by_user)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
@@ -86,7 +94,6 @@ export async function addMessage(
     });
     await updateJob(tx, job, {});
     return { messageId, changeRequestId };
-  });
 }
 
 function holdStateFor(job: JobRow): Partial<JobRow> {

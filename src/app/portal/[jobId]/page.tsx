@@ -16,7 +16,7 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
       <div className="portal">
         <main id="main" className="narrow">
           <h1>Open your review link</h1>
-          <p>This page needs the review link the business sent you. Links expire, so ask the business for a new one if needed.</p>
+          <p>Open the review link the business shared with you. If it has expired, ask them for a new one.</p>
         </main>
       </div>
     );
@@ -41,7 +41,7 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
           {v.job.title}
         </p>
 
-        {v.linkReplaced && <div className="notice warn">This proposal has been replaced. Review the current version below.</div>}
+        {v.linkReplaced && <div className="notice warn">There’s a newer version of this agreement. Please review it below.</div>}
         {checkout === "cancelled" && <div className="notice info">You left PayPal without paying. Nothing was charged.</div>}
 
         {v.pending && v.pendingTerms ? (
@@ -85,7 +85,7 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
                     </tbody>
                   </table>
                 ) : (
-                  <p>The details are unchanged; the price or terms changed.</p>
+                  <p>The order details haven’t changed, but the price or terms have.</p>
                 )
               ) : (
                 <table>
@@ -129,7 +129,7 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
                   <span className="rule" />
                   <dt className="strong">To pay after you approve</dt>
                   <dd className="strong">{money(v.pendingTerms.dueNowMinor)}</dd>
-                  <dt>Rest, paid later</dt>
+                  <dt>Remaining balance</dt>
                   <dd>{money(v.pendingTerms.remainingAfterDepositMinor)}</dd>
                 </dl>
                 {v.pending.content.terms.merchantNote && <p className="small" style={{ marginTop: "0.75rem" }}>Note from the business: {v.pending.content.terms.merchantNote}</p>}
@@ -151,7 +151,7 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
             <div className="panel">
               <p className="money-big">{money(payable.amount_minor)}</p>
               <p className="muted">
-                {payable.purpose === "BALANCE" ? "The remaining balance for your order." : "Work starts once this is received."} You approve the payment on PayPal; nothing is charged automatically.
+                {payable.purpose === "BALANCE" ? "This is the remaining balance for your order." : "The business can release the work once the payment is confirmed and the other requirements are met."} You’ll approve the payment on PayPal. Nothing is charged automatically.
               </p>
               {paymentsConfigured() ? <PayButton obligationId={payable.id} amountMinor={payable.amount_minor} /> : <p className="notice warn">Payments are not configured on this demo server.</p>}
               {payable.status === "PROCESSING" && (
@@ -173,7 +173,7 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
         ) : (
           <section>
             <p className="portal-step">All set</p>
-            <h1>Nothing is needed from you</h1>
+            <h1>You’re all caught up</h1>
             <p className="muted">
               {v.job.fulfillmentState === "IN_PROGRESS" ? "Your order is in production." : v.job.fulfillmentState === "COMPLETED" ? "Your order is complete." : "The business has everything it needs. We'll show any new step here."}
             </p>
@@ -181,7 +181,7 @@ export default async function PortalPage(props: PageProps<"/portal/[jobId]">) {
         )}
 
         {v.reviewPayments.length > 0 && (
-          <div className="notice warn">A payment you made arrived after the proposal was replaced. It is recorded and safe; the business will review it with you.</div>
+          <div className="notice warn">A payment arrived after the agreement was replaced. It has been recorded, and the business will review what to do with it.</div>
         )}
 
         {v.effective && (

@@ -18,7 +18,8 @@
     "worker": "node --env-file-if-exists=.env.local --import tsx scripts/worker.ts",
     "eval:ai": "node --env-file-if-exists=.env.local --import tsx scripts/eval-ai.ts",
     "smoke:paypal": "node --env-file-if-exists=.env.local --import tsx scripts/paypal-smoke.ts",
-    "check:docs": "python3 scripts/check_pact_docs.py"
+    "check:docs": "python3 scripts/check_pact_docs.py",
+    "telegram:setup": "node --env-file-if-exists=.env.local --import tsx scripts/telegram-setup.ts"
   },
   "dependencies": {
     "@google/genai": "2.30.0",

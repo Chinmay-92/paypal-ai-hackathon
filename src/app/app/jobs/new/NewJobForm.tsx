@@ -116,13 +116,13 @@ export function NewJobForm({ catalogs }: { catalogs: Record<Domain, Catalog> }) 
       <h2 style={{ marginTop: "1.5rem" }}>2. What was agreed</h2>
       <section className="quote-start" aria-labelledby="quote-h">
         <h2 id="quote-h">Start from the quote you sent (optional)</h2>
-        <p className="small muted">Paste the agreed quote or thread. Pact proposes the terms with quotes from your text; review every field below before saving. Prices always come from your rate card.</p>
+        <p className="small muted">Paste the quote or conversation you agreed on. Pact will suggest details and show where it found them. Check each field before saving; prices come from your rate card.</p>
         <div className="field">
           <label htmlFor="quote">Pasted text</label>
           <textarea id="quote" value={quote} onChange={(e) => setQuote(e.target.value)} maxLength={8000} />
         </div>
         <button type="button" className="primary" onClick={extract} disabled={extracting || quote.trim().length < 10}>
-          {extracting ? "Reading…" : "Propose terms from this text"}
+          {extracting ? "Reading…" : "Suggest agreement details"}
         </button>
         {extractError && (
           <p role="alert" className="notice bad small">
@@ -132,7 +132,7 @@ export function NewJobForm({ catalogs }: { catalogs: Record<Domain, Catalog> }) 
         {extracted && (
           <div className="stack" role="status" style={{ marginTop: "0.75rem" }}>
             <p className="small">
-              Proposed by {extracted.extractor.startsWith("model:") ? `model (${extracted.extractor.slice(6)})` : "deterministic baseline"}. Filled in below; nothing is saved yet.
+              Suggested by {extracted.extractor.startsWith("model:") ? `AI model ${extracted.extractor.slice(6)}` : "Pact’s rules-based fallback"}. Check the details below; nothing has been saved yet.
             </p>
             {extracted.citations.length > 0 && (
               <table className="small">
@@ -184,7 +184,7 @@ export function NewJobForm({ catalogs }: { catalogs: Record<Domain, Catalog> }) 
       <div className="grid-2" style={{ marginTop: "1rem" }}>
         <div className="field">
           <label htmlFor="deposit">
-            Deposit (% of total) <span className="hint">Rounded half-up to the cent</span>
+            Deposit (% of total) <span className="hint">Rounded to the nearest cent</span>
           </label>
           <input id="deposit" type="number" min={0} max={100} value={deposit} onChange={(e) => setDeposit(Math.min(100, Math.max(0, Number(e.target.value))))} />
         </div>

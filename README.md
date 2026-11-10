@@ -46,6 +46,8 @@ Stack in use: TypeScript, Next.js 16.4.2 / React 19.3, PostgreSQL via `pg`, zod 
 
 ## Hosted demo
 
+An additional $0-limited deployment is at https://pact-web-mz18.onrender.com/demo. On November 10, a synthetic apparel run reached customer approval, sandbox deposit and top-up, a cited Gemini proposal, released R2 job sheet and a partial refund; Pact displayed the captures and refund as completed and recorded capture events from verified webhooks. The full model evaluation remains open. Its free database expires on December 10, 2026, before the stated judging end; continuity still needs verification. The web service can spin down or be suspended when free limits are reached. See [deployment decisions](docs/pact/11-evidence-decisions.md#deployment-update-2026-11-10).
+
 https://pact-web-h9pp.onrender.com/demo creates a private synthetic workspace. It uses the PayPal sandbox only. It runs on Render's free tier, so the first request after 15 idle minutes can take about a minute.
 
 ## Run locally
@@ -93,6 +95,8 @@ Give judges sandbox buyer credentials privately in the submission's testing inst
 
 Last verified 2026-10-22 on branch `feat/pact-app`.
 
+The local interface has since been refreshed with a new landing page, sign-in, and merchant navigation; the agreement and payment workflows are unchanged. This visual refresh has not been deployed.
+
 Working locally:
 
 - Merchant login with hashed sessions and tenant-scoped queries; owner and fulfillment roles. Customer review links are stored hashed and swapped for a short job-scoped session.
@@ -131,3 +135,7 @@ Deadline: **November 13, 2026, 01:30 IST** (November 12, 12:00 PST). Runnable bu
 Earlier concepts remain historical and do not define current Pact requirements: [brainstorm](docs/brainstorm.md), [research](docs/research.md), [general stress test](docs/stress-test.md), [ClaimIt](docs/stress-test-claimit.md), [SpecLock](docs/stress-test-speclock.md).
 
 Code and original documentation are MIT licensed; third-party materials retain their own rights. Pact is a working name selected by the project owner, not a trademark-cleared brand.
+
+### Telegram message intake
+
+Optional: set `TELEGRAM_BOT_TOKEN` in the ignored `.env.local` (or the host's secret settings), run database migrations, and set `APP_ORIGIN` to the public HTTPS origin. Run `npm run telegram:setup` to register the webhook; it refuses to replace a different existing webhook. In a job's Conversation tab, the owner creates a single-use link and shares it privately. The customer opens it, taps Start, and sends a text message to the bot. Messages enter Pact for review; the bot does not send replies. A link expires after 24 hours, the connected chat expires after 30 days, and generating a new link disconnects the previous one. Anyone holding the link can connect, so a Telegram sender's identity is not verified. Text only; groups and attachments are not supported. This integration must be deployed and configured before a hosted bot can receive updates.

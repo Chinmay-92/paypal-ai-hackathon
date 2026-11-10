@@ -1,5 +1,5 @@
 const MESSAGES: Record<string, string> = {
-  replaced: "This proposal has been replaced. Ask the business for the link to the current version.",
+  replaced: "There’s a newer version of this agreement. Ask the business for an updated link.",
   expired: "This review link has expired. Ask the business for a new one.",
   invalid: "This review link is not valid.",
 };

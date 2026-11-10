@@ -14,7 +14,7 @@ export async function resetDb() {
   await pool().query(
     `TRUNCATE tenants, users, merchant_sessions, catalog_items, customers, jobs, agreement_revisions, source_messages, change_requests,
      review_invitations, customer_sessions, approvals, payment_obligations, payment_operations, captures, refund_operations,
-     payment_events, audit_events, outbox, attachments CASCADE`,
+     payment_events, audit_events, outbox, attachments, telegram_updates CASCADE`,
   );
 }
 

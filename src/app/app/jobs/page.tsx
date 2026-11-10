@@ -7,7 +7,7 @@ import { money } from "@/ui/format";
 const GROUPS: { key: string; title: string; hint: string; filters: JobListItem["filter"][] }[] = [
   { key: "you", title: "Needs you", hint: "Review a change, publish a revision or decide on a payment.", filters: ["needs_review", "exception", "draft"] },
   { key: "others", title: "Waiting on others", hint: "The customer is reviewing or paying, or PayPal is confirming.", filters: ["awaiting_customer", "awaiting_payment"] },
-  { key: "team", title: "With the team", hint: "Released work and production.", filters: ["ready", "in_progress"] },
+  { key: "team", title: "With the team", hint: "Jobs that are ready or in progress.", filters: ["ready", "in_progress"] },
   { key: "done", title: "Completed", hint: "", filters: ["completed"] },
 ];
 
@@ -41,7 +41,7 @@ export default async function JobsPage() {
       {jobs.length === 0 && (
         <div className="panel empty">
           <h2>Start with your first job</h2>
-          <p>Enter the agreed scope or paste the quote you sent. Pact keeps every later change, approval and payment in line with it.</p>
+          <p>Enter the agreement or paste your quote. You can review changes, track approvals and follow payments as the job moves forward.</p>
           {actor.role === "owner" && (
             <Link className="button primary" href="/app/jobs/new">
               Create a job

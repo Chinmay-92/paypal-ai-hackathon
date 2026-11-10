@@ -86,8 +86,8 @@ export function ChangeReview(props: {
   if (cr.status === "ANALYZING") {
     return (
       <div className="panel" role="status">
-        <h2>New message is being analyzed</h2>
-        <p className="muted">The job is held for review. If the model is unavailable, the deterministic baseline runs instead.</p>
+        <h2>Reading the new message</h2>
+        <p className="muted">This job is on hold while Pact checks the message. If the AI is unavailable, Pact uses a simpler method.</p>
         <button type="button" onClick={() => router.refresh()}>
           Check again
         </button>
@@ -116,9 +116,9 @@ export function ChangeReview(props: {
         Change request <Badge status={cr.status} /> {cr.intent && <span className="badge accent">{label(cr.intent)}</span>}
       </h2>
       <p className="small muted">
-        Proposed by {cr.extractor?.startsWith("model:") ? `model (${cr.extractor.slice(6)})` : "deterministic baseline"}. A proposal is not a decision: you set prices and publish.
+        Suggested by {cr.extractor?.startsWith("model:") ? `AI model ${cr.extractor.slice(6)}` : "Pact’s rules-based fallback"}. You decide the price and whether to publish.
       </p>
-      {!props.baseIsCurrent && <div className="notice warn">This request was analyzed against an earlier revision. Reject it or edit the agreement manually.</div>}
+      {!props.baseIsCurrent && <div className="notice warn">This request was checked against an older agreement. Reject it or update the agreement yourself.</div>}
       <h3 className="review-step">1. Check what Pact found</h3>
       {proposal?.rationale && <p>{proposal.rationale}</p>}
 
@@ -171,7 +171,7 @@ export function ChangeReview(props: {
       )}
       {cr.issues.length > 0 && (
         <div className="notice warn">
-          <p>Validation flagged parts of this proposal; they were not pre-filled:</p>
+          <p>Pact couldn’t confirm these details, so they haven’t been filled in:</p>
           <ul>{cr.issues.map((m) => <li key={m}>{m}</li>)}</ul>
         </div>
       )}
@@ -203,10 +203,10 @@ export function ChangeReview(props: {
             </p>
           )}
           <h3 className="review-step">2. Fill in what&apos;s missing</h3>
-          <p className="small muted">Proposed values are filled in. Anything marked unresolved must be answered before the customer can see it.</p>
+          <p className="small muted">Review the suggested details and fill in anything marked unresolved before publishing.</p>
           <ScopeEditor fields={props.fields} scope={scope} onChange={setScope} artwork={props.artwork} highlight={supported.map((c) => c.field)} idPrefix={`cr-${cr.id}`} />
           <h3 className="review-step">3. Set the price</h3>
-          <p className="small muted">From your rate card. Pact never sets prices; change anything you need.</p>
+          <p className="small muted">These prices come from your rate card. Check them and make any changes you need.</p>
           <LineItemsEditor items={items} onChange={setItems} idPrefix={`cr-li-${cr.id}`} onSuggest={() => setItems(TEMPLATES[domain].suggestLineItems(scope, rateCard))} />
           <div className="field" style={{ marginTop: "0.75rem", maxWidth: 240 }}>
             <label htmlFor={`dep-${cr.id}`}>Deposit (%)</label>
@@ -229,7 +229,7 @@ export function ChangeReview(props: {
             <button className="primary big" type="submit" disabled={busy}>
               Create draft revision
             </button>
-            <span className="small muted">You will see the customer&apos;s view before anything is sent.</span>
+            <span className="small muted">You can review the agreement before publishing it. Nothing is sent automatically.</span>
           </div>
         </form>
       )}

@@ -33,7 +33,7 @@ export function DemoLauncher() {
             }
           }}
         >
-          {busy ? "Creating your workspace…" : "Create my demo workspace"}
+          {busy ? "Creating your workspace…" : "Set up my demo"}
         </button>
       </div>
     );
@@ -42,12 +42,12 @@ export function DemoLauncher() {
     <div className="stack" role="status">
       <div className="panel">
         <h2>Your workspace is ready</h2>
-        <p>You are signed in as the business owner. Suggested walkthrough:</p>
+        <p>You’re signed in as the business owner. Here’s one way to try Pact:</p>
         <ol>
-          <li>Open a customer link below in a private window (or on your phone). Approve the agreement and pay the deposit with a sandbox buyer.</li>
-          <li>Back here, open the job and paste a change, e.g. “Make ten of those hoodies instead. Use the attached logo on everything.”</li>
-          <li>Review the cited proposal, fill in what&apos;s missing, publish, and send the new link to the customer.</li>
-          <li>Approve and pay the top-up as the customer, then release work and open the job sheet.</li>
+          <li>Open a customer link below in a private window or on your phone. Approve the agreement and pay the deposit with a sandbox buyer account.</li>
+          <li>Back here, open the job and paste a change. For example: “Make ten of those hoodies instead. Use the attached logo on everything.”</li>
+          <li>Check the proposed changes, fill in what&apos;s missing, publish the revision and share the new customer link.</li>
+          <li>As the customer, approve the revision and pay the additional deposit. Then return here to release the work and open the job sheet.</li>
         </ol>
       </div>
       {demo.jobs.map((j) => (
@@ -75,7 +75,7 @@ export function DemoLauncher() {
           <br />
           Password: <code>{demo.password}</code>
         </p>
-        <p className="small muted">Shown once. Synthetic accounts for this demo workspace only.</p>
+        <p className="small muted">Shown once. These test accounts work only in this demo workspace.</p>
       </details>
     </div>
   );

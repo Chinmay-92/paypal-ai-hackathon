@@ -24,7 +24,7 @@ The same engine runs two domains: custom apparel and a website project.
 
 ## How we built it
 
-TypeScript, Next.js 16 / React 19, PostgreSQL, PayPal Orders v2 and Payments v2 REST APIs (sandbox), and Gemini through `@google/genai`. Hosted on Render: https://pact-web-h9pp.onrender.com
+TypeScript, Next.js 16 / React 19, PostgreSQL, PayPal Orders v2 and Payments v2 REST APIs (sandbox), and Gemini through `@google/genai`. Current demo on Render: https://pact-web-mz18.onrender.com
 
 PayPal usage:
 - An Orders v2 `CAPTURE` checkout per payment obligation, with a stable `PayPal-Request-Id` for each durable operation.
@@ -33,14 +33,20 @@ PayPal usage:
 - Merchant-reviewed partial refunds.
 - Verified webhooks (`verify-webhook-signature`), deduplicated by event ID.
 
-AI usage: Gemini (`gemini-3.7-flash`, falling back to `gemini-3.5-flash`) classifies each message's intent and proposes field changes as JSON. Every proposal is validated:
+AI usage: the current demo is configured to use Gemini `gemini-3.5-flash-lite` to classify each message's intent and propose field changes as JSON. Every proposal is validated:
 - Quotes must be literal spans of the message.
 - Fields and catalog items must exist.
 - Old values must match the current agreement.
 
 A deterministic baseline runs if the model is unavailable. Model output can only create proposal records.
 
-## Verified (2026-10-22)
+## Verified on the current demo (2026-11-10)
+
+- In one synthetic apparel run, a sandbox buyer approved the initial revision and paid a $300 deposit; a cited Gemini proposal was reviewed and published; the buyer approved R2 and paid a $100 top-up. Pact displayed both captures as completed. The business released R2 and the job sheet displayed the authorized revision. A $10 partial refund was submitted and Pact displayed it as completed. These are sandbox transactions, not real payments.
+- The current webhook was configured for sandbox order approvals and capture events. The job timeline recorded webhook-sourced capture records for both payments as verified with PayPal, and marked the refund verified with PayPal. The full Gemini evaluation has not been completed for this model.
+- The latest local check passed typecheck, lint, documentation checks and 34 standalone unit tests. The PostgreSQL integration suite did not run successfully in the current environment.
+
+## Earlier evidence (2026-10-22)
 
 - PayPal sandbox, driven through the UI with a sandbox buyer: $300 deposit captured; amendment approved and $100 top-up captured; work released; $10 partial refund completed. Each provider resource was re-read independently. Three real webhook deliveries (order approved, capture completed, capture refunded) were signature-verified and processed once each.
 - Hosted on Render: a sandbox deposit capture plus webhook, and a partial refund plus webhook, verified on https://pact-web-h9pp.onrender.com (2026-10-22).
@@ -53,15 +59,15 @@ A deterministic baseline runs if the model is unavailable. Model output can only
 - Synthetic demo data. No user interviews or real historical cases yet, so there are no claims about time saved or demand.
 - The AI evaluation is small and synthetic. The deterministic baseline does not generalize well to the held-out cases.
 - Attachments are stored in PostgreSQL. Customer identity is a review-link session, not a verified signature.
-- TODO: hosting tier and any known issues at submission.
+- The current free Render database expires December 10, 2026, before the stated end of judging. A tested $0 continuity plan is still required; free hosting can sleep or be suspended at usage limits.
 
 ## Testing instructions template
 
 Put credentials **only** in Devpost's private testing-instructions field, never in the repository.
 
-1. Open https://pact-web-h9pp.onrender.com/demo and click **Create my demo workspace**. You are signed in as the business owner of a private synthetic workspace.
+1. Open https://pact-web-mz18.onrender.com/demo and click **Create my demo workspace**. You are signed in as the business owner of a private synthetic workspace.
 2. Open a customer link in a private window. Approve, then pay with the PayPal sandbox buyer: email TODO, password TODO. Always log in on PayPal's page; never enter a real card.
-3. Back in the workspace, paste `Make ten of those hoodies instead. Use the attached logo on everything.` (optionally attach an image), resolve sizes, publish, approve as the customer, and pay the top-up.
+3. Back in the workspace, paste `Make ten of those hoodies instead.`, resolve sizes, publish, approve as the customer, and pay the top-up.
 4. Release work and open the job sheet. Try a refund from Payments.
 
 ## Video (under 3 minutes)

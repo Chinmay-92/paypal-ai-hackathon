@@ -11,7 +11,7 @@ export default async function NewJobPage() {
   return (
     <div style={{ maxWidth: 900 }}>
       <h1>New job</h1>
-      <p className="muted">Enter the original agreement. It is saved as a draft; publish it to send the customer a review link.</p>
+      <p className="muted">Enter the original agreement and save it as a draft. Once you publish it, you can share a review link with your customer.</p>
       <NewJobForm catalogs={{ apparel, website }} />
     </div>
   );

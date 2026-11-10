@@ -139,7 +139,7 @@ export type MessageRow = {
   author_role: "customer" | "merchant";
   sent_at_label: string | null;
   body: string;
-  provenance: "user_supplied" | "portal_authenticated";
+  provenance: "user_supplied" | "portal_authenticated" | "telegram";
   content_hash: string;
   attachment_ids: string[];
   created_at: Date;

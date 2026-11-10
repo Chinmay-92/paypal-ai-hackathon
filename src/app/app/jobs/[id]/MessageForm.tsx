@@ -37,8 +37,8 @@ export function MessageForm({ jobId, customerName }: { jobId: string; customerNa
         }
       }}
     >
-      <h3>Add correspondence</h3>
-      <p className="small muted">Paste one message. It is stored as untrusted data and analyzed for a proposed change.</p>
+      <h3>Add a message</h3>
+      <p className="small muted">Paste a message from the conversation. Pact will check it for possible changes for you to review.</p>
       <div className="grid-2">
         <div className="field">
           <label htmlFor="author">Author</label>
@@ -54,7 +54,7 @@ export function MessageForm({ jobId, customerName }: { jobId: string; customerNa
       </div>
       <div className="field">
         <label htmlFor="sentAt">
-          Stated time <span className="hint">Optional, as written in the original thread</span>
+          Time in the original message <span className="hint">Optional, as written in the original thread</span>
         </label>
         <input id="sentAt" name="sentAt" maxLength={60} />
       </div>

@@ -7,13 +7,17 @@ export default function LoginPage() {
       <header className="topbar">
         <Brand />
       </header>
-    <main id="main" className="narrow">
-      <div className="panel" style={{ maxWidth: 420, margin: "3rem auto" }}>
-        <h1>Sign in to Pact</h1>
-        <p className="muted small">Synthetic demo accounts are created by the seed script. Sandbox only.</p>
-        <LoginForm />
-      </div>
-    </main>
+      <main id="main" className="auth-page">
+        <div className="auth-intro">
+          <h1>Manage orders<br />and projects.</h1>
+          <p>Sign in to review changes, track payments and update your team.</p>
+        </div>
+        <div className="panel auth-card">
+          <h2>Sign in</h2>
+          <p className="muted small">Use your demo account to sign in. Payments are for testing only.</p>
+          <LoginForm />
+        </div>
+      </main>
     </>
   );
 }
