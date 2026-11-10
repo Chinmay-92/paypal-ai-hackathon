@@ -62,7 +62,7 @@ export default async function Home() {
                   <path d="M387 190v33h33" fill="none" stroke="#ecffff" strokeOpacity=".6" />
                   <text x="280" y="221" fill="#e9fbfb" fontFamily="monospace" fontSize="10" letterSpacing="1">PACT / REVISION</text>
                   <path d="M280 247h105M280 261h92M280 275h108" stroke="#e6f7f5" strokeOpacity=".62" strokeWidth="2" />
-                  <rect x="276" y="291" width="119" height="25" rx="2" fill="#d3f0dd" fillOpacity=".75" />
+                  <rect x="276" y="291" width="119" height="25" rx="2" fill="#d4e7ff" fillOpacity=".75" />
                   <text x="283" y="308" fill="#173d4c" fontFamily="monospace" fontSize="10" fontWeight="700">CHANGE REVIEW</text>
                   <path d="M280 337h102M280 351h82M280 365h109" stroke="#e6f7f5" strokeOpacity=".58" strokeWidth="2" />
                   <path d="M280 388h42m21 0h42" stroke="#f4ffff" strokeOpacity=".8" />
